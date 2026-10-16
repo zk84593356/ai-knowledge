@@ -436,7 +436,7 @@ tests/                        # 校验器、单元测试、验收用例与测试
 docs/                         # 安装、使用、架构与各版本历史验收记录
 ```
 
-更多用法见 [使用示例](docs/usage-examples.md)，设计取舍见 [架构说明](docs/architecture.md)，版本变化见 [更新记录](CHANGELOG.md)。
+默认值、指定配置和示例索引见 [使用示例（补充）](docs/usage-examples.md)，设计取舍见 [架构说明](docs/architecture.md)，版本变化见 [更新记录](CHANGELOG.md)。
 
 ## 开发与测试
 

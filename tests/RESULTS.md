@@ -2,7 +2,7 @@
 
 ## README 使用指南 — 2026-10-17
 
-只改 README.md 和本记录、更新记录，Skill 文件没有变化。
+只改 README.md、docs/usage-examples.md（精简为补充页）和本记录、更新记录，Skill 文件没有变化。
 
 | 命令/检查 | 本轮结果 |
 | --- | --- |
