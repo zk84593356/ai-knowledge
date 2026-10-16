@@ -1,9 +1,9 @@
 ---
 name: ai-knowledge
-description: 把功能开发复盘、源码讲解、知识点学习和问题排查，写成一篇可以直接发表的高质量中文知识文章（公众号、知乎、X 长文等），同时交付只给作者看的发布前核验记录，默认配封面与解释图；支持按需改编小红书、微博，组合个人写作风格与视觉品牌，并能从初稿/终稿对比学习作者习惯。Use for turning feature retrospectives, codebase explanations, concepts and troubleshooting into one publishable article with a fact-check review and images.
+description: 把功能开发复盘、源码讲解、知识点学习和问题排查，写成一篇可以直接发表的高质量中文知识文章（公众号、知乎、X 长文等），同时交付只给作者看的发布前核验记录，默认配封面与解释图；支持按需改编小红书、微博，组合个人写作风格与视觉品牌，能从初稿/终稿对比学习作者习惯，也能在用户发来人物图并明确要求时建立个人视觉品牌。Use for turning feature retrospectives, codebase explanations, concepts and troubleshooting into one publishable article with a fact-check review and images, and for building a personal visual brand kit from a character image on explicit request.
 license: MIT
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # AI Knowledge
@@ -83,5 +83,9 @@ metadata:
 - 从多篇参考文章分析风格：[风格分析](references/style-analysis.md)。
 - 比较作者初稿和满意终稿、学习修改习惯：[文章复盘](references/style-reflection.md)。只复盘时只交付复盘报告。
 - 写回个人规则：[个人风格写回](references/style-source-update.md)，写到个人配置目录，不需要重装 Skill。单篇观察先记为候选，经用户确认才生效。
+
+## 建立视觉品牌（按需）
+
+用户发来一张人物或角色图，**并且**明确要求用它建立视觉品牌、个人资产或 Brand Kit 时，按 [建立视觉品牌](references/visual-brand-setup.md) 执行：问三个问题，在个人配置目录的 `brands/<brand-id>/` 生成草稿，可选生成三视图和场景候选，用户确认后才自动使用。只发图、写文章时附带的图片、一次性的风格参考都不启动这个流程。
 
 正常写作不读学习日志、不运行分析脚本。不自动发布、Commit、Push 或全局安装；不修改业务代码；不直接写用户 Vault，除非用户指定它为输出位置。

@@ -1,6 +1,17 @@
 # 更新记录
 
-## 0.4.0 — 2026-10-16（本地交付，未提交）
+## 0.5.0 — 2026-10-16
+
+视觉品牌精简为一种格式，并支持用一张人物图建立品牌。
+
+- 品牌格式：`brand-kit.json`（`schemaVersion` 为 `"2"`）加 character.md、style.md、provenance.md 和 `assets/`。品牌有 `draft`/`confirmed` 两种状态，每张图有 `proposed`/`confirmed` 两种状态，图片角色只有 canonical、scene、layout。不再支持旧格式；旧品牌会被当作无效并回退通用图解，安装说明给出转换方法。四个模板在 `assets/templates/brand/`。
+- 建立品牌：新增 references/visual-brand-setup.md。只有"人物图 + 明确要求"同时出现才启动；问名字、来源、用途三个问题，在个人配置目录的 `brands/<brand-id>/` 生成草稿，原图原样保存；可选生成三视图和场景候选（需要能接收参考图的生图工具），候选放在 `candidates/`，选中的才登记；用户确认后才改为正式，没有默认品牌时自动设为默认，已有时先询问。
+- 选用品牌：写文章时可以说"用 `<brand-id>` 品牌"按名字选用；默认位置 `visual/` 只自动使用已确认的品牌。
+- 检查工具：visual_assets.py 改为校验新格式，新增 `context --brand-id`、`list`（列出个人配置目录里的品牌）和 `inspect`（读出图片尺寸与 SHA-256，供登记使用，不写文件）。
+- 测试：新增 test_brand_kit.py；演示配置的品牌改为新格式，新增草稿品牌夹具 `brands/demo-draft/`；validate.py 检查新增的说明文档、四个品牌模板和两套演示品牌。
+- 文档：README、使用示例、安装说明（v0.4.0 → v0.5.0 升级）、架构说明同步。
+
+## 0.4.0 — 2026-10-16
 
 目标从"三份稿件"改为"一篇可以直接发表的文章"。
 

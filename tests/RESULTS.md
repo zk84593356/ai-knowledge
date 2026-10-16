@@ -1,5 +1,31 @@
 # 实际验收记录
 
+## v0.5.0 精简视觉品牌 + 用一张图建立品牌 — 2026-10-16
+
+视觉品牌只认一种格式（brand-kit.json `schemaVersion` "2" + character.md、style.md、provenance.md + assets/），新增建立品牌的说明文档、四个模板，以及检查工具的 `--brand-id`、`list`、`inspect`。
+
+### 实际检查
+
+| 命令/检查 | 本轮结果 |
+| --- | --- |
+| python -m unittest discover -s tests | 159 项：158 通过、1 跳过（符号链接权限，同前）；新增 test_brand_kit.py 15 项 |
+| python tests/validate.py | PASS，0 项发现；新增检查 visual-brand-setup.md、四个品牌模板、草稿品牌夹具 |
+| python tests/validate.py --skill skills/ai-knowledge | PASS |
+| python tests/validate.py --bundle（两篇示范） | 均 PASS |
+| python skills/ai-knowledge/scripts/visual_assets.py bundle（两篇示范） | ok，0 错误 |
+| visual_assets.py kit / inspect（两套演示品牌） | ok；inspect 输出与登记一致 |
+| node tests/check-mermaid.mjs | 1 图渲染通过 |
+| 全仓库文本扫描 | 个人品牌名只出现在 validate.py 的守卫常量里 |
+
+### 本机私有品牌的转换（不在仓库内）
+
+作者本机的默认品牌按新格式转换：旧目录先整体复制到本机 backup 目录并逐文件比对 SHA-256（24 个文件一致）；十几份规范、提示词和模板合并为三份规范，11 张图片字节不变，状态和授权保持原样。转换后 `kit` 检查通过，`context --visual` 自动选中该品牌。
+
+### 没有验证的
+
+- 没有用真实人物图完整走一遍建立流程（三个问题、看图写规范、生成三视图和场景候选、确认）。自动测试只覆盖"模板 + inspect 能拼出一套通过检查的草稿"，看图写出的识别点是否准确、生成的候选是否走样，仍要靠人工判断。
+- 没有在 Codex 等其他宿主里实测触发条件（"图片 + 明确要求"）。
+
 ## v0.4.0 个人配置移出公开仓库 — 2026-10-16
 
 个人写作规则与视觉品牌改放使用者的个人配置目录（明确路径 → `AI_KNOWLEDGE_PERSONAL` → `~/.ai-knowledge/personal/`），包内 `styles/` 目录、相关历史文档与含角色的示例图片从仓库移除。完整 Git 历史已打包备份在本机私有目录，未推送。

@@ -95,16 +95,20 @@ python skills/ai-knowledge/scripts/style_learning.py compare --draft tests/fixtu
 python skills/ai-knowledge/scripts/style_learning.py compare --final tests/fixtures/style-reflection/sso-final.md
 ```
 
-Skill 不附带任何个人配置。个人配置放在用户本地：环境变量 `AI_KNOWLEDGE_PERSONAL` 指向的目录，或 `~/.ai-knowledge/personal`；根目录下是 `writing-rules.md`、`writing-profile.md`、`learning-log.md`，品牌包在 `visual/brand-kit.json`。都没有时使用公共写作规则和通用图解。`validate.py` 要求安装包内不存在 `styles/personal`，仓库级检查还会在 `skills/` 与 `examples/` 的文件名和内容里查找原私人配置的标识，防止私人配置回流；`docs/`、`CHANGELOG.md` 与 `tests/RESULTS.md` 保留历史记录，不在此检查范围。演示配置的三份 Markdown 与 `visual/` 品牌包也由仓库级检查验证。
+Skill 不附带任何个人配置。个人配置放在用户本地：环境变量 `AI_KNOWLEDGE_PERSONAL` 指向的目录，或 `~/.ai-knowledge/personal`；根目录下是 `writing-rules.md`、`writing-profile.md`、`learning-log.md`，默认品牌在 `visual/`，其他品牌在 `brands/<brand-id>/`。都没有时使用公共写作规则和通用图解。`validate.py` 要求安装包内不存在 `styles/personal`，仓库级检查还会在 `skills/` 与 `examples/` 的文件名和内容里查找原私人配置的标识，防止私人配置回流；`docs/`、`CHANGELOG.md` 与 `tests/RESULTS.md` 保留历史记录，不在此检查范围。演示配置的三份 Markdown、已确认的 `visual/` 品牌和草稿品牌 `brands/demo-draft/` 也由仓库级检查验证。
 
 测试脚本不证明某次风格改写的事实一定正确，也不能代替宿主写回权限检查。事实不变、公共提案确认、源路径未知与隐私边界由 [复盘用例](cases/style-reflection.md) 记录主 Agent 的实际决策，不伪装成自动语义测试。
 
 ## 视觉检查
 
-`test_visual_assets.py` 覆盖按需读取、品牌包查找顺序（显式 `--brand` > `$AI_KNOWLEDGE_PERSONAL/visual` > `~/.ai-knowledge/personal/visual`）、环境变量失效时不改读主目录、`--no-brand`、指定/损坏/缺失回退通用图解、图片边界与哈希、危险 SVG、草稿状态、缺图与未登记图片、文章只嵌 PNG/JPEG、无图主题不要求台账、有图或有 assets/ 时必须有台账、品牌版本一致性、迁移目录及安装包只读。
+`test_visual_assets.py` 覆盖按需读取、品牌包查找顺序（显式 `--brand` > `--brand-id` > `$AI_KNOWLEDGE_PERSONAL/visual` > `~/.ai-knowledge/personal/visual`）、环境变量失效时不改读主目录、`--no-brand`、指定/损坏/缺失回退通用图解、图片边界与哈希、危险 SVG、草稿状态、缺图与未登记图片、文章只嵌 PNG/JPEG、无图主题不要求台账、有图或有 assets/ 时必须有台账、品牌版本一致性、迁移目录及安装包只读。
+
+`test_brand_kit.py` 覆盖精简品牌格式（`schemaVersion` 必须为 `"2"`，三份规范必须存在，字段取值、配色、identity 必须指向已登记的母版）、已确认品牌的母版必须已确认、默认位置的草稿不自动使用、`--brand-id` 按名字选用草稿且缺失或非法时不替换、环境变量失效时不改读主目录、`list` 列出默认和其他品牌、`inspect` 报告登记与校验值且不写文件、四个模板填好后能通过检查，以及命令行参数互斥。
 
 ```powershell
 python skills/ai-knowledge/scripts/visual_assets.py kit tests/fixtures/personal-demo/visual
+python skills/ai-knowledge/scripts/visual_assets.py kit tests/fixtures/personal-demo/brands/demo-draft
+python skills/ai-knowledge/scripts/visual_assets.py inspect tests/fixtures/personal-demo/brands/demo-draft
 python skills/ai-knowledge/scripts/visual_assets.py context --visual --brand tests/fixtures/personal-demo/visual
 python skills/ai-knowledge/scripts/visual_assets.py bundle examples/concept-sso
 python skills/ai-knowledge/scripts/visual_assets.py bundle examples/feature-oidc-demo

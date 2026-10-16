@@ -186,17 +186,10 @@ class VisualTests(unittest.TestCase):
         data["identity"]["turnaround"] = "../outside.png"
         path.write_text(json.dumps(data), encoding="utf-8")
         self.assertTrue(visual.validate_kit(kit))
-        data["identity"]["turnaround"] = "assets/turnaround.png"
+        data["identity"]["turnaround"] = "assets/canonical/turnaround.png"
         data["contentGuidelines"]["character"] = "missing.md"
         path.write_text(json.dumps(data), encoding="utf-8")
         self.assertTrue(visual.validate_kit(kit))
-
-    def test_demo_kit_keeps_visual_plan_template(self):
-        self.assertEqual(visual.validate_kit(KIT), [])
-        kit = self.root / "kit"; shutil.copytree(KIT, kit)
-        data = json.loads((kit / "brand-kit.json").read_text("utf-8"))
-        (kit / data["templates"]["visualPlan"]).unlink()
-        self.assertIn("missing templates.visualPlan", visual.validate_kit(kit))
 
     def test_manifest_paths_reject_windows_urls_encoded_traversal(self):
         for target in ("../x", "/x", "C:/x", r"a\b", "https://example.com/x",

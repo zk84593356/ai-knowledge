@@ -5,9 +5,15 @@ registered in assets/manifest.json as an editable source. A topic with no assets
 directory and no embedded image passes, because images are optional.
 Does not generate images, infer facts, approve aesthetics, or establish rights.
 
-No personal brand kit is bundled. Lookup order: --brand <kit-dir>, then
-$AI_KNOWLEDGE_PERSONAL/visual, then ~/.ai-knowledge/personal/visual; the kit root holds
-brand-kit.json. Missing or invalid kits fall back to generic visuals.
+No personal brand kit is bundled. Lookup order: --brand <kit-dir>, then --brand-id <id>
+(<personal>/brands/<id>), then the default <personal>/visual, where <personal> is
+$AI_KNOWLEDGE_PERSONAL or ~/.ai-knowledge/personal. A kit root holds brand-kit.json
+(schemaVersion 2) plus character.md, style.md, provenance.md and assets/.
+Missing or invalid kits fall back to generic visuals. A draft kit is used only when the
+user selects it explicitly; the default location never auto-loads a draft.
+
+`list` shows the kits in the personal directory; `inspect` prints the size and SHA-256
+of every image under a kit's assets/ so the Agent can register them. No command writes.
 """
 import argparse
 import base64
@@ -25,6 +31,17 @@ ENV_VAR = "AI_KNOWLEDGE_PERSONAL"
 LIMIT = 64 * 1024 * 1024
 TYPES = {"cover", "infographic", "chart", "illustration", "banner", "profile-card"}
 PUBLISHABLE = {".png", ".jpg", ".jpeg"}
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".svg"}
+BRAND_ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
+HEX = re.compile(r"#[0-9A-Fa-f]{6}\Z")
+KIT_STATUS = {"draft", "confirmed"}
+LICENSE = {"local-only", "pending", "public"}
+USAGE = {"article", "video"}
+PALETTE_STATUS = {"proposed", "confirmed"}
+ASSET_ROLES = {"canonical", "scene", "layout"}
+ASSET_STATUS = {"proposed", "confirmed"}
+IDENTITY_KEYS = ("original", "turnaround", "detail")
+GUIDELINES = ("character", "style", "provenance")
 
 
 def read(path):
@@ -146,46 +163,118 @@ def verify_image(root, record):
     return path
 
 
+def text_field(kit, field, errors):
+    if not isinstance(kit.get(field), str) or not kit[field].strip():
+        errors.append("missing kit " + field)
+
+
 def validate_kit(root):
+    """Check a schemaVersion 2 kit: fields, states, registered images, identity, documents."""
     errors = []
     try:
         kit = load(contained(root, "brand-kit.json"))
-        for field in ("brandId", "kitVersion", "licenseStatus"):
-            if not isinstance(kit.get(field), str) or not kit[field].strip():
-                errors.append("missing kit " + field)
-        if not isinstance(kit.get("approval"), dict):
-            errors.append("missing approval states")
+        if kit.get("schemaVersion") != "2":
+            raise ValueError("brand-kit.json schemaVersion must be \"2\"")
+        for field in ("brandId", "name", "kitVersion"):
+            text_field(kit, field, errors)
+        brand_id = kit.get("brandId")
+        if isinstance(brand_id, str) and (len(brand_id) > 40 or not BRAND_ID.fullmatch(brand_id)):
+            errors.append("brandId must be lowercase letters, digits and hyphens (max 40)")
+        if kit.get("status") not in KIT_STATUS:
+            errors.append("kit status must be draft or confirmed")
+        if kit.get("licenseStatus") not in LICENSE:
+            errors.append("licenseStatus must be local-only, pending or public")
+        usage = kit.get("usage")
+        if not isinstance(usage, list) or not usage or not set(usage) <= USAGE or len(set(usage)) != len(usage):
+            errors.append("usage must list article and/or video")
+        approval = kit.get("approval")
+        if not isinstance(approval, dict) or approval.get("brandPalette") not in PALETTE_STATUS:
+            errors.append("approval.brandPalette must be proposed or confirmed")
+        palette = kit.get("palette")
+        if not isinstance(palette, dict) or not palette or any(
+                not isinstance(v, str) or not HEX.fullmatch(v) for v in palette.values()):
+            errors.append("palette must map names to #RRGGBB colors")
         assets = kit.get("assets")
         if not isinstance(assets, list) or not assets:
             raise ValueError("nonempty assets list required")
-        ids, paths = set(), set()
+        ids, by_path = set(), {}
         for index, asset in enumerate(assets):
             try:
-                if not isinstance(asset.get("id"), str) or not asset["id"] or asset["id"] in ids:
-                    raise ValueError("missing or duplicate asset id")
+                asset_id = asset.get("id")
+                if not isinstance(asset_id, str) or not BRAND_ID.fullmatch(asset_id) or asset_id in ids:
+                    raise ValueError("missing, malformed or duplicate asset id")
+                if asset.get("role") not in ASSET_ROLES:
+                    raise ValueError("role must be canonical, scene or layout")
+                if asset.get("status") not in ASSET_STATUS:
+                    raise ValueError("asset status must be proposed or confirmed")
                 path = verify_image(root, asset)
-                if path in paths:
+                if path in by_path:
                     raise ValueError("duplicate asset path")
-                ids.add(asset["id"])
-                paths.add(path)
+                ids.add(asset_id)
+                by_path[path] = asset
             except (OSError, ValueError, KeyError, TypeError, AttributeError, ET.ParseError) as exc:
                 errors.append(f"asset {index}: {exc}")
-        for group, required in (
-            ("identity", ("turnaround", "detail", "original")),
-            ("contentGuidelines", ("brandPositioning", "character", "styleDNA", "visualGuidelines",
-                                   "scenes", "provenance", "quality")),
-            ("templates", ("visualPlan", "characterPrompt", "knowledgeVisualPrompt")),
-        ):
-            values = kit.get(group, {})
-            for key in required:
-                path = contained(root, values.get(key))
-                if not path.is_file():
-                    errors.append(f"missing {group}.{key}")
-                if group == "identity" and path not in paths:
-                    errors.append(f"unverified identity.{key}")
+        identity = kit.get("identity")
+        if not isinstance(identity, dict) or "original" not in identity:
+            errors.append("identity.original required")
+            identity = {}
+        for key, value in identity.items():
+            if key not in IDENTITY_KEYS:
+                errors.append(f"unknown identity.{key}")
+                continue
+            asset = by_path.get(contained(root, value))
+            if asset is None:
+                errors.append(f"unverified identity.{key}")
+            elif asset["role"] != "canonical":
+                errors.append(f"identity.{key} must be a canonical asset")
+            elif kit.get("status") == "confirmed" and asset["status"] != "confirmed":
+                errors.append(f"confirmed kit needs confirmed identity.{key}")
+        guidelines = kit.get("contentGuidelines")
+        if not isinstance(guidelines, dict):
+            guidelines = {}
+        for key in GUIDELINES:
+            try:
+                if not contained(root, guidelines.get(key)).is_file():
+                    errors.append(f"missing contentGuidelines.{key}")
+            except ValueError as exc:
+                errors.append(f"contentGuidelines.{key}: {exc}")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ET.ParseError) as exc:
         errors.append(str(exc))
     return errors
+
+
+def inspect_kit(root):
+    """Describe every image under <kit>/assets/ against the registered records; read-only."""
+    root = Path(root)
+    registered = {}
+    try:
+        kit = load(contained(root, "brand-kit.json"))
+        for asset in kit.get("assets") or []:
+            if isinstance(asset, dict) and isinstance(asset.get("path"), str):
+                registered[asset["path"]] = asset
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+    images, seen = [], set()
+    base = root / "assets"
+    for path in sorted(base.rglob("*")) if base.is_dir() else []:
+        if not path.is_file() or path.suffix.lower() not in IMAGE_SUFFIXES:
+            continue
+        relative = path.relative_to(root).as_posix()
+        seen.add(relative)
+        entry = {"path": relative, "registered": relative in registered}
+        try:
+            contained(root, relative)
+            width, height = dimensions(path)
+            entry.update(width=width, height=height, sha256=hashlib.sha256(read(path)).hexdigest())
+            if entry["registered"]:
+                record = registered[relative]
+                entry["matches"] = (record.get("width"), record.get("height"), record.get("sha256")) == (
+                    width, height, entry["sha256"])
+        except (OSError, ValueError, ET.ParseError) as exc:
+            entry["error"] = str(exc)
+        images.append(entry)
+    missing = sorted(p for p in registered if p not in seen)
+    return {"kit": str(root.resolve()), "images": images, "registered_missing": missing}
 
 
 def personal_root():
@@ -200,7 +289,14 @@ def personal_root():
         return "home", None
 
 
-def select_context(visual=False, no_brand=False, brand=None):
+def kit_summary(root):
+    kit = load(root / "brand-kit.json")
+    return {"brandId": kit["brandId"], "name": kit["name"], "status": kit["status"],
+            "kitVersion": kit["kitVersion"], "usage": kit["usage"], "approval": kit["approval"],
+            "licenseStatus": kit["licenseStatus"]}
+
+
+def select_context(visual=False, no_brand=False, brand=None, brand_id=None):
     if not visual:
         return {"route": "text-only", "source": None, "source_path": None, "brand": None,
                 "reason": "visual resources not loaded"}
@@ -213,29 +309,66 @@ def select_context(visual=False, no_brand=False, brand=None):
         root = base
     else:
         source, base = personal_root()
-        result["source"] = source
+        result["source"] = "named" if brand_id is not None else source
         if base is None:
             result["reason"] = (ENV_VAR + " is not an absolute path; generic visuals" if source == "env"
                                 else "home directory unavailable; generic visuals")
             return result
-        root = base / "visual"
-    result.update(source=source, source_path=str(base.resolve()))
-    if source != "explicit" and not base.is_dir():
+        if brand_id is not None:
+            if not isinstance(brand_id, str) or not BRAND_ID.fullmatch(brand_id):
+                result["reason"] = "invalid brand id; generic visuals, do not substitute another kit"
+                return result
+            root = base / "brands" / brand_id
+        else:
+            root = base / "visual"
+    selected = source == "explicit" or brand_id is not None
+    result.update(source="named" if brand_id is not None and source != "explicit" else source,
+                  source_path=str(base.resolve()))
+    if not selected and not base.is_dir():
         # A broken env setting must not silently fall through to the home directory.
         result["reason"] = (ENV_VAR + " directory missing; generic visuals, home not substituted"
                             if source == "env" else "no personal config directory; generic visuals")
         return result
     errors = validate_kit(root)
     if errors:
-        result.update(reason=("explicit kit unavailable or invalid; generic visuals, do not substitute another kit"
-                              if source == "explicit" else "personal kit missing or invalid; generic visuals"),
+        result.update(reason=("selected kit unavailable or invalid; generic visuals, do not substitute another kit"
+                              if selected else "personal kit missing or invalid; generic visuals"),
                       issues=errors)
         return result
-    kit = load(root / "brand-kit.json")
-    return {"route": "explicit" if source == "explicit" else "personal", "source": source,
-            "source_path": result["source_path"], "brand": str(root.resolve()), "brandId": kit["brandId"],
-            "kitVersion": kit["kitVersion"], "approval": kit["approval"],
-            "licenseStatus": kit["licenseStatus"]}
+    summary = kit_summary(root)
+    if not selected and summary["status"] != "confirmed":
+        result.update(reason="default kit is a draft; confirm it or select it by name before use",
+                      draft=str(root.resolve()))
+        return result
+    route = "explicit" if source == "explicit" else ("named" if brand_id is not None else "personal")
+    return {"route": route, "source": result["source"], "source_path": result["source_path"],
+            "brand": str(root.resolve()), **summary}
+
+
+def list_kits():
+    """List the default kit and brands/<id> kits in the personal directory; read-only."""
+    source, base = personal_root()
+    result = {"source": source, "source_path": str(base.resolve()) if base else None, "kits": []}
+    if base is None or not base.is_dir():
+        return result
+    candidates = [("default", base / "visual")]
+    brands = base / "brands"
+    if brands.is_dir():
+        candidates += [("brands/" + p.name, p) for p in sorted(brands.iterdir()) if p.is_dir()]
+    for location, root in candidates:
+        if not (root / "brand-kit.json").is_file():
+            continue
+        errors = validate_kit(root)
+        entry = {"location": location, "path": str(root.resolve()), "ok": not errors}
+        if errors:
+            entry["issues"] = errors
+        else:
+            entry.update(kit_summary(root))
+            if location != "default" and entry["brandId"] != root.name:
+                entry["ok"] = False
+                entry["issues"] = ["directory name differs from brandId"]
+        result["kits"].append(entry)
+    return result
 
 
 def image_links(text):
@@ -384,16 +517,24 @@ def main(argv=None):
     context = sub.add_parser("context")
     context.add_argument("--visual", action="store_true")
     context.add_argument("--no-brand", action="store_true")
-    context.add_argument("--brand", type=Path)
-    for name in ("kit", "bundle"):
+    choice = context.add_mutually_exclusive_group()
+    choice.add_argument("--brand", type=Path)
+    choice.add_argument("--brand-id")
+    sub.add_parser("list")
+    for name in ("kit", "bundle", "inspect"):
         command = sub.add_parser(name)
         command.add_argument("directory", type=Path)
         if name == "bundle":
             command.add_argument("--brand", type=Path)
     args = parser.parse_args(argv)
+    failed = False
     if args.command == "context":
-        result = select_context(visual=args.visual, no_brand=args.no_brand, brand=args.brand)
-        failed = False
+        result = select_context(visual=args.visual, no_brand=args.no_brand, brand=args.brand,
+                                brand_id=args.brand_id)
+    elif args.command == "list":
+        result = list_kits()
+    elif args.command == "inspect":
+        result = inspect_kit(args.directory)
     else:
         errors = (validate_kit(args.directory) if args.command == "kit"
                   else validate_bundle(args.directory, args.brand))

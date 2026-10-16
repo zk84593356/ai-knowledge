@@ -41,12 +41,15 @@ v0.4.0 只交付一篇可以直接发表的 article.md，把所有生产信息�
 | style-loading.md / style-application.md | 公共技法与个人规则的组合、覆盖、回退 | 写作时 |
 | personal-experience.md | 少量可跳过的经历问题、公开范围 | 确需真实经历时 |
 | style-analysis.md / style-reflection.md / style-source-update.md | 多篇风格分析、初稿/终稿复盘、个人风格写回 | 用户请求时 |
-| assets/templates/ | article.md、review.md 及风格档案、规则、复盘、经历模板 | 写对应产物时 |
+| visual-brand-setup.md | 用一张人物图建立视觉品牌：触发条件、三个问题、草稿、候选、确认 | 用户发图并明确要求时 |
+| assets/templates/ | article.md、review.md 及风格档案、规则、复盘、经历模板；`brand/` 下是视觉品牌的四个模板 | 写对应产物时 |
 | scripts/ | 只读辅助：analyze_style.py、style_learning.py、visual_assets.py | 可选，Python 3.10+ 标准库 |
 
 ## 个人配置不随包分发
 
 个人写作规则和视觉品牌是作者的私有资产，放在 Skill 之外的个人配置目录：用户明确给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → 主目录下的 `.ai-knowledge/personal/`。都没有时用公共技法和通用图解。
+
+视觉品牌只有一种格式：`brand-kit.json` 加 character.md、style.md、provenance.md 和 `assets/`。旧版一个品牌有十几份规范、提示词和模板，内容互相重复，还和 Skill 里的通用配图规则重叠；合并后，解释图只需读 brand-kit.json 和 style.md，画人物时再读 character.md，读得少也更不容易漏掉约束。品牌和每张图都有"待确认 / 已确认"两种状态，草稿品牌不会被自动使用，避免一张未经确认的图悄悄改变所有文章的配图。用一张图建立品牌的流程见 [建立视觉品牌](../skills/ai-knowledge/references/visual-brand-setup.md)：只有"图片 + 明确要求"同时出现才启动。
 
 这样分有三个好处：Skill 可以公开分享而不带出私人资料；风格学习写回个人目录，下次调用就生效，不用重装 Skill；每个使用者只会用到自己的配置。代价是换电脑时要自己带上这个目录，可以把它放进一个私有仓库，再用环境变量指过去。仓库校验器会在 skills/ 或 examples/ 里重新出现个人配置时报错。
 
@@ -81,5 +84,6 @@ Skill 不依赖 Codex 专用 API。文件读取、联网、写文件、生图和
 - v0.2.1：个人写作规则与文章复盘。
 - v0.3.0：视觉品牌、视觉计划与资产检查。
 - v0.4.0：改为一篇可发表文章加发布前核验记录，默认配图；个人配置移出 Skill，放到使用者自己的目录。
+- v0.5.0：视觉品牌精简为四个文件；支持用一张人物图建立品牌、按名字选用品牌，草稿确认后才自动使用。
 
 历史验收记录中提到的已删除文件保留为纯文本路径。

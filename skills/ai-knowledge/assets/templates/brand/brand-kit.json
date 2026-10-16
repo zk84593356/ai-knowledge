@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "2",
+  "brandId": "{{brand-id}}",
+  "name": "{{显示名}}",
+  "kitVersion": "0.1.0",
+  "status": "draft",
+  "usage": ["article", "video"],
+  "licenseStatus": "pending",
+  "approval": {
+    "brandPalette": "proposed"
+  },
+  "palette": {
+    "primary": "#RRGGBB",
+    "light": "#RRGGBB",
+    "dark": "#RRGGBB",
+    "accent": "#RRGGBB"
+  },
+  "identity": {
+    "original": "assets/canonical/original.png"
+  },
+  "contentGuidelines": {
+    "character": "character.md",
+    "style": "style.md",
+    "provenance": "provenance.md"
+  },
+  "assets": [
+    {
+      "id": "original",
+      "path": "assets/canonical/original.png",
+      "role": "canonical",
+      "status": "proposed",
+      "width": 0,
+      "height": 0,
+      "sha256": "{{用 visual_assets.py inspect 的输出填写}}"
+    }
+  ]
+}

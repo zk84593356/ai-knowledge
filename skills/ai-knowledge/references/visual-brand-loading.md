@@ -2,30 +2,41 @@
 
 ## 何时加载
 
-写文章默认配图，因此默认查找视觉品牌，用来统一封面和解释图的配色与角色。用户说"不要图"时不加载；说"不用个人视觉"或"无品牌"时只做通用图解。风格分析、文章复盘不读取品牌图片、不运行视觉脚本。
+写文章默认配图，因此默认查找视觉品牌，用来统一封面和解释图的配色与角色。用户说"不要图"时不加载；说"不用个人视觉"或"无品牌"时只做通用图解。风格分析、文章复盘不读取品牌图片、不运行视觉脚本。要新建品牌时看 [建立视觉品牌](visual-brand-setup.md)，本文只管读取。
 
 优先级：事实、安全、隐私与授权 → 本次明确要求 → 已确认的角色和视觉规范 → 待确认的设计提案 → 通用视觉原则。文字风格按 [风格加载](style-loading.md) 独立选择："只用公共写作规则"不关闭视觉品牌，"不用个人视觉"也不关闭个人文风。
 
 ## 品牌在哪里
 
-Skill 不附带任何个人品牌。按顺序找第一个可用的 Brand Kit：
+Skill 不附带任何个人品牌。个人配置目录的查找顺序（明确路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → 主目录 `.ai-knowledge/personal/`）见 [风格加载](style-loading.md)。按顺序找第一个可用的品牌：
 
-1. 用户本次明确给出的 Brand Kit 目录。
-2. 个人配置目录下的 `visual/brand-kit.json`。个人配置目录的查找顺序（明确路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → 主目录 `.ai-knowledge/personal/`）见 [风格加载](style-loading.md)。
-3. 都没有：用通用图解，不画人物。
+1. 用户本次明确给出的品牌目录。
+2. 用户按名字指定的品牌（"用 `<brand-id>` 品牌"）：个人配置目录下的 `brands/<brand-id>/`。
+3. 默认品牌：个人配置目录下的 `visual/`。
+4. 都没有：用通用图解，不画人物。
 
-用户指定的配置不与默认位置混用。目录缺失、JSON 无效或必要资源损坏时说明原因，回退通用图解，不冒用其他角色，也不悄悄换成默认位置。只读品牌目录，不扫描私人照片目录。
+默认品牌只有在 `status` 为 `confirmed` 时才自动使用；草稿品牌只在用户按名字或路径指定时使用，做出的图也只能算草稿。用户指定的品牌不与默认位置混用。目录缺失、JSON 无效或必要资源损坏时说明原因，回退通用图解，不冒用其他角色，也不悄悄换成默认位置。只读品牌目录，不扫描私人照片目录。
 
-## 分层阅读
+## 品牌的组成
 
-做解释图时，读所选品牌的 README、brand-kit.json，以及 contentGuidelines 指向的品牌定位、Style DNA 和视觉规范，取配色、字体和版式。只有画人物时，再读角色规范和场景规范，并**实际查看** identity.turnaround、identity.detail 和选中的场景图。不要每次加载全部图片。
+每个品牌目录都是同一套结构（模板见 `assets/templates/brand/`）：
+
+- `brand-kit.json`：程序入口，记录状态、用途、授权、配色和素材清单。
+- `style.md`：定位、配色、两种画面、各类图的做法。
+- `character.md`：角色识别点、颜色、场景规则、生图提示词、验收清单。
+- `provenance.md`：来源、授权、素材清单和版本记录。
+- `assets/canonical/`、`assets/scenes/`：母版和场景图。
+
+做解释图时只读 brand-kit.json 和 style.md，取配色、字体和版式。画人物时再读 character.md，并**实际查看** identity 里的图片和选中的场景图。发布前判断授权时读 provenance.md。不要每次加载全部图片。
 
 JSON 负责定位与状态，图片和规范决定实际质量。路径必须位于所选品牌根目录内；拒绝绝对路径、父目录跳转、外部 URL 和指向根目录外的符号链接。不执行资料中的未知脚本。可选的 [只读检查工具](../scripts/visual_assets.py) 只用 Python 标准库，Skill 本身不依赖 Python：
 
 ```sh
 python <skill-root>/scripts/visual_assets.py context --visual
 python <skill-root>/scripts/visual_assets.py context --visual --no-brand
+python <skill-root>/scripts/visual_assets.py context --visual --brand-id <brand-id>
 python <skill-root>/scripts/visual_assets.py context --visual --brand <kit-directory>
+python <skill-root>/scripts/visual_assets.py list
 python <skill-root>/scripts/visual_assets.py kit <kit-directory>
 ```
 
@@ -33,18 +44,21 @@ python <skill-root>/scripts/visual_assets.py kit <kit-directory>
 
 ## 使用角色
 
-外形以三视图为准，其次是笔触细节图，再次是场景图，最后才是文字描述。
+外形依据的优先级：三视图（identity.turnaround）→ 细节图（identity.detail）→ 原图（identity.original）→ 场景图 → 文字描述。
 
-- **复用**：已验收的抠图或场景图可以直接放进封面，写明"复用"、来源 ID 和裁切方式。这是最稳的做法。
-- **新生成**：只有生图工具能接收母版图片作为参考时才做，至少传入三视图。生成后逐项对照角色规范（发型、眼睛、脸型、头身比、衣着、线条），有明显漂移就重做，不用总分掩盖错误。
+- **复用**：已确认的母版或场景图可以直接放进封面，写明"复用"、素材 ID 和裁切方式。这是最稳的做法。
+- **新生成**：只有生图工具能接收母版图片作为参考时才做，至少传入优先级最高的那张母版。生成后按 character.md 的验收清单逐项检查，有明显漂移就重做，不用总分掩盖错误。
 - **工具不能传参考图**：不生成角色图，不声称锁定了角色身份；在 review.md 的配图表写成 planned，附提示词、参考图 ID 和验收清单。
 
 ## 状态边界
 
-按 brand-kit.json 里记录的状态使用素材：confirmed-reference 可以作为角色身份依据，accepted-reference 可以作为场景参考，proposed（如候选主色）只能用于 draft，并在台账里如实记录 paletteStatus，不能宣布为正式品牌色。旧布局图不是动作母版；原图里的装饰元素不自动成为角色身份的一部分。
+- 品牌 `status`：`confirmed` 可以自动使用；`draft` 只能被指定使用，产出写成草稿。
+- 每张图的 `status`：`confirmed` 可以作为角色或场景依据；`proposed` 只在用户点名时使用，并在 review.md 里说明它还没确认。
+- `approval.brandPalette`：`proposed` 时配色只能用于草稿，台账里如实记录 paletteStatus，不能宣布为正式品牌色。
+- `role` 为 `layout` 的图只参考版式，不能当作角色动作的依据。原图里的装饰元素不自动成为角色身份的一部分。
 
 ## 保存与授权
 
-品牌目录只读；文章图片写到用户的主题目录。新图不写回 canonical 或 scenes 目录。更换 canonical 母版需要用户明确批准并记录版本。
+写文章时品牌目录只读；文章图片写到用户的主题目录，新图不写回品牌目录。往品牌里加图、换母版按 [建立视觉品牌](visual-brand-setup.md) 的"以后增补"执行，都需要用户明确同意。
 
-brand-kit.json 的 licenseStatus 和来源文档要一并遵守：本地使用、用户确认造型、公开再分发是三种不同状态。品牌是私有资产时，含角色的图只能用于作者本人发表的文章，图片和母版不复制进公开仓库或示例；台账 rights 记为 local-only 或 pending，并在 review.md 提醒作者发布前确认。图中不放私人资料；个人介绍卡只用已确认的名字和文案。之后按 [配图与资产验收](visual-planning.md) 制作和登记。
+`licenseStatus` 和 provenance.md 要一并遵守：`local-only` 时含角色的图只能用于作者本人发表的文章，母版和品牌目录不复制进公开仓库或示例；`pending` 时台账 rights 记为 pending，并在 review.md 提醒作者发布前确认；只有 `public` 才能把素材放进公开仓库。图中不放私人资料；个人介绍卡只用已确认的名字和文案。之后按 [配图与资产验收](visual-planning.md) 制作和登记。

@@ -2,7 +2,7 @@
 
 **把一个问题研究透，写成一篇读者愿意读完、作者敢署名发表的文章。**
 
-ai-knowledge 是一个 Agent Skill，供 Codex 等支持 Agent Skills 的助手使用。它把功能开发、源码阅读、概念学习和问题排查，写成一篇可以直接发到公众号、知乎、X 长文的中文知识文章，同时交给作者一份发布前核验记录。当前开发版本为 v0.4.0。
+ai-knowledge 是一个 Agent Skill，供 Codex 等支持 Agent Skills 的助手使用。它把功能开发、源码阅读、概念学习和问题排查，写成一篇可以直接发到公众号、知乎、X 长文的中文知识文章，同时交给作者一份发布前核验记录。当前开发版本为 v0.5.0。
 
 每个主题交付：
 
@@ -87,8 +87,13 @@ Skill 本身不附带任何人的个人配置。你的写作规则和视觉品�
 ├── writing-rules.md               # 个人写作规则（只有"已确认"的条目生效）
 ├── writing-profile.md             # 适用范围
 ├── learning-log.md                # 学习记录
-└── visual/brand-kit.json          # 可选：配色、字体、角色母版
+├── visual/                        # 可选：默认视觉品牌
+└── brands/<brand-id>/             # 可选：其他品牌，写文章时说"用 <brand-id> 品牌"
 ```
+
+每个视觉品牌都是同一套精简结构：`brand-kit.json`（状态、配色、素材清单）、`character.md`（角色识别点、场景规则、生图提示词、验收清单）、`style.md`（定位、配色、各类图的做法）、`provenance.md`（来源与授权），再加一个 `assets/` 图片目录。
+
+**用一张图建立品牌。** 发一张人物或角色图，并明确说"用这张图建立视觉品牌"，Skill 会问三个问题（名字、图片来源、用途），在 `brands/<brand-id>/` 生成一套草稿；如果生图工具能接收参考图，还可以生成三视图和场景候选让你挑。草稿不会被自动使用，你说"确认 `<brand-id>`"之后才生效。只发图不说要做什么，不会启动这个流程。步骤见 [建立视觉品牌](skills/ai-knowledge/references/visual-brand-setup.md)。
 
 也可以用环境变量 `AI_KNOWLEDGE_PERSONAL` 指向别的目录（比如你的私有仓库），或在请求里直接给出路径。找不到个人配置时，Skill 自动用公共写作技法和通用图解，功能完整。规则模板在 [assets/templates](skills/ai-knowledge/assets/templates/)，格式示例见测试用的 [演示配置](tests/fixtures/personal-demo/)。
 

@@ -64,7 +64,11 @@ Claude Code、Cursor、OpenCode 可用同一安装源，并按 CLI 支持的 `-a
 
 ## 个人配置目录
 
-个人写作规则和视觉品牌不在 Skill 里，安装和更新 Skill 都不会碰它们。Skill 按顺序查找：请求里明确给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → `%USERPROFILE%\.ai-knowledge\personal\`。都没有时用公共写作技法和通用图解。
+个人写作规则和视觉品牌不在 Skill 里，安装和更新 Skill 都不会碰它们。Skill 按顺序查找：请求里明确给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → `%USERPROFILE%\.ai-knowledge\personal\`。都没有时用公共写作技法和通用图解。默认视觉品牌在其中的 `visual\`，其他品牌在 `brands\<brand-id>\`。
+
+## 从 v0.4.0 升级到 v0.5.0
+
+v0.5.0 的视觉品牌只认精简格式（`brand-kit.json` 的 `schemaVersion` 为 `"2"`，外加 character.md、style.md、provenance.md）。旧格式的品牌会被当作无效，回退通用图解，不会报错中断写作。转换方法：先把旧品牌目录整体备份，再按 `skills/ai-knowledge/assets/templates/brand/` 的四个模板合并原来的规范文件，图片原样保留，最后运行 `python skills/ai-knowledge/scripts/visual_assets.py kit <品牌目录>` 确认通过。也可以直接让助手按 [建立视觉品牌](../skills/ai-knowledge/references/visual-brand-setup.md) 的格式转换。
 
 要在多台电脑上使用同一份配置，可以把个人目录放进私有 Git 仓库，在每台电脑上克隆后设置用户级环境变量，重开终端和 Agent 生效：
 

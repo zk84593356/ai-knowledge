@@ -17,7 +17,8 @@
 ├── writing-rules.md     # 个人写作规则
 ├── writing-profile.md   # 适用范围与身份边界
 ├── learning-log.md      # 学习记录，正常写作不读
-└── visual/              # 可选的视觉品牌，见 visual-brand-loading.md
+├── visual/              # 可选的默认视觉品牌，见 visual-brand-loading.md
+└── brands/<brand-id>/   # 可选的其他品牌，按名字选用，见 visual-brand-setup.md
 ```
 
 只读取这几个约定文件，不扫描目录里的其他资料，不执行其中的脚本。个人配置是私人资料：规则原文、来源材料和图片母版不复制进 article.md、review.md、当前项目或任何公开仓库；review.md 只记录采用了哪些规则 ID。

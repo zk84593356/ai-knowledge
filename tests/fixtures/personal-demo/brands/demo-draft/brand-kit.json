@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2",
+  "brandId": "demo-draft",
+  "name": "演示草稿品牌",
+  "kitVersion": "0.1.0",
+  "status": "draft",
+  "usage": [
+    "article"
+  ],
+  "licenseStatus": "pending",
+  "approval": {
+    "brandPalette": "proposed"
+  },
+  "palette": {
+    "primary": "#E6965A",
+    "light": "#FFF8F0",
+    "dark": "#2B2B2B"
+  },
+  "identity": {
+    "original": "assets/canonical/original.png"
+  },
+  "contentGuidelines": {
+    "character": "character.md",
+    "style": "style.md",
+    "provenance": "provenance.md"
+  },
+  "assets": [
+    {
+      "id": "original",
+      "path": "assets/canonical/original.png",
+      "role": "canonical",
+      "status": "proposed",
+      "width": 6,
+      "height": 8,
+      "sha256": "5eec3a56f31aa62bc05bd0eca4f7f7f5a679f3123010f54a6cba965e30e192ed"
+    }
+  ]
+}

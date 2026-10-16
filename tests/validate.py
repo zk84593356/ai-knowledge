@@ -30,14 +30,16 @@ SUMMARY_LIMIT = 60
 MODES = {"feature", "concept", "problem"}
 REFERENCES = (
     "publishing", "writing-craft", "editing", "feature-analysis", "concept-explanation",
-    "problem-review", "visual-planning", "visual-brand-loading", "personal-experience",
+    "problem-review", "visual-planning", "visual-brand-loading", "visual-brand-setup", "personal-experience",
     "style-loading", "style-application", "style-analysis", "style-reflection", "style-source-update",
 )
 TEMPLATES = ("article", "review", "personal-experience", "style-reflection",
              "writing-profile", "writing-rules")
+BRAND_TEMPLATES = ("brand-kit.json", "character.md", "style.md", "provenance.md")
 SCRIPTS = ("scripts/analyze_style.py", "scripts/style_learning.py", "scripts/visual_assets.py")
 EXAMPLE_BUNDLES = ("concept-sso", "feature-oidc-demo")
 DEMO_KIT = "tests/fixtures/personal-demo/visual"
+DEMO_DRAFT_KIT = "tests/fixtures/personal-demo/brands/demo-draft"
 # Personal config lives outside the repository; these trees must never carry it again.
 PRIVATE_MARKER = "anyues"
 PRIVATE_SCAN = ("skills", "examples")
@@ -201,6 +203,9 @@ def validate_skill(folder):
     for name in TEMPLATES:
         if not (folder / "assets/templates" / f"{name}.md").is_file():
             errors.append(f"missing template: {name}")
+    for name in BRAND_TEMPLATES:
+        if not (folder / "assets/templates/brand" / name).is_file():
+            errors.append(f"missing brand template: {name}")
     for relative in SCRIPTS:
         if not (folder / relative).is_file():
             errors.append(f"missing script: {relative}")
@@ -389,6 +394,7 @@ def validate_repo(root):
     errors.extend(private_config_findings(root))
     visual = visual_checker(root / "skills/ai-knowledge")
     errors.extend("demo kit: " + e for e in visual.validate_kit(root / DEMO_KIT))
+    errors.extend("demo draft kit: " + e for e in visual.validate_kit(root / DEMO_DRAFT_KIT))
     covered = set()
     for topic in EXAMPLE_BUNDLES:
         folder = root / "examples" / topic
