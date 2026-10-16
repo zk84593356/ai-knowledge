@@ -30,11 +30,12 @@ SUMMARY_LIMIT = 60
 MODES = {"feature", "concept", "problem"}
 REFERENCES = (
     "publishing", "writing-craft", "editing", "feature-analysis", "concept-explanation",
-    "problem-review", "visual-planning", "visual-brand-loading", "visual-brand-setup", "personal-experience",
+    "problem-review", "visual-planning", "visual-art-direction", "visual-brand-loading", "visual-brand-setup",
+    "personal-experience",
     "style-loading", "style-application", "style-analysis", "style-reflection", "style-source-update",
 )
 TEMPLATES = ("article", "review", "personal-experience", "style-reflection",
-             "writing-profile", "writing-rules")
+             "writing-profile", "writing-rules", "art-brief")
 BRAND_TEMPLATES = ("brand-kit.json", "character.md", "style.md", "provenance.md")
 SCRIPTS = ("scripts/analyze_style.py", "scripts/style_learning.py", "scripts/visual_assets.py")
 EXAMPLE_BUNDLES = ("concept-sso", "feature-oidc-demo")

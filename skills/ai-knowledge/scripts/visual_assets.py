@@ -38,7 +38,7 @@ KIT_STATUS = {"draft", "confirmed"}
 LICENSE = {"local-only", "pending", "public"}
 USAGE = {"article", "video"}
 PALETTE_STATUS = {"proposed", "confirmed"}
-ASSET_ROLES = {"canonical", "scene", "layout"}
+ASSET_ROLES = {"canonical", "scene", "layout", "sample"}
 ASSET_STATUS = {"proposed", "confirmed"}
 IDENTITY_KEYS = ("original", "turnaround", "detail")
 GUIDELINES = ("character", "style", "provenance")
@@ -204,7 +204,7 @@ def validate_kit(root):
                 if not isinstance(asset_id, str) or not BRAND_ID.fullmatch(asset_id) or asset_id in ids:
                     raise ValueError("missing, malformed or duplicate asset id")
                 if asset.get("role") not in ASSET_ROLES:
-                    raise ValueError("role must be canonical, scene or layout")
+                    raise ValueError("role must be canonical, scene, layout or sample")
                 if asset.get("status") not in ASSET_STATUS:
                     raise ValueError("asset status must be proposed or confirmed")
                 path = verify_image(root, asset)

@@ -2,7 +2,7 @@
 
 **把一个问题研究透，写成一篇读者愿意读完、作者敢署名发表的文章。**
 
-ai-knowledge 是一个 Agent Skill，供 Codex 等支持 Agent Skills 的助手使用。它把功能开发、源码阅读、概念学习和问题排查，写成一篇可以直接发到公众号、知乎、X 长文的中文知识文章，同时交给作者一份发布前核验记录。当前开发版本为 v0.5.0。
+ai-knowledge 是一个 Agent Skill，供 Codex 等支持 Agent Skills 的助手使用。它把功能开发、源码阅读、概念学习和问题排查，写成一篇可以直接发到公众号、知乎、X 长文的中文知识文章，同时交给作者一份发布前核验记录。当前开发版本为 v0.6.0。
 
 每个主题交付：
 
@@ -95,6 +95,8 @@ Skill 本身不附带任何人的个人配置。你的写作规则和视觉品�
 
 **用一张图建立品牌。** 发一张人物或角色图，并明确说"用这张图建立视觉品牌"，Skill 会问三个问题（名字、图片来源、用途），在 `brands/<brand-id>/` 生成一套草稿；如果生图工具能接收参考图，还可以生成三视图和场景候选让你挑。草稿不会被自动使用，你说"确认 `<brand-id>`"之后才生效。只发图不说要做什么，不会启动这个流程。步骤见 [建立视觉品牌](skills/ai-knowledge/references/visual-brand-setup.md)。
 
+**一套图好看、统一、认得出。** [美术方向](skills/ai-knowledge/references/visual-art-direction.md) 把审美写成九条可执行的公式：一个材质比喻、一支笔、一个只当工具用的主色、从角色识别点提取的签名图形、固定版式标记、角色当讲解员、字少字大、生图有规矩、整组验收。每个品牌在 style.md 的"视觉语言"里写下自己的答案；建立品牌或改视觉语言时做一次四图测试（封面、流程图、数据图、插画），满意的那组登记为风格样板。一次出整套图时，用 [出图说明模板](skills/ai-knowledge/assets/templates/art-brief.md) 交给能接收参考图的生图工具。
+
 也可以用环境变量 `AI_KNOWLEDGE_PERSONAL` 指向别的目录（比如你的私有仓库），或在请求里直接给出路径。找不到个人配置时，Skill 自动用公共写作技法和通用图解，功能完整。规则模板在 [assets/templates](skills/ai-knowledge/assets/templates/)，格式示例见测试用的 [演示配置](tests/fixtures/personal-demo/)。
 
 风格可以学习：比较 AI 初稿和你满意的终稿，总结修改习惯；单篇观察先记为候选，经你确认才写回个人配置目录，不需要重装 Skill。见 [复盘演示](examples/style-reflection/report.md)。
@@ -120,7 +122,8 @@ skills/ai-knowledge/          # 唯一的 Skill 源码，安装时复制整个�
 │   ├── writing-craft.md      # 立意、标题、开头、结构、段落、代码、结尾
 │   ├── editing.md            # 三遍编辑、公开安全过滤、独立复查
 │   ├── feature-analysis.md / concept-explanation.md / problem-review.md
-│   ├── visual-planning.md / visual-brand-loading.md
+│   ├── visual-planning.md / visual-art-direction.md
+│   ├── visual-brand-loading.md / visual-brand-setup.md
 │   └── personal-experience.md / style-*.md
 ├── assets/templates/         # article.md、review.md 及风格档案模板
 └── scripts/                  # 只读辅助：visual_assets.py、style_learning.py、analyze_style.py

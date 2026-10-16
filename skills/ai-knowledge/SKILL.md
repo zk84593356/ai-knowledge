@@ -3,7 +3,7 @@ name: ai-knowledge
 description: 把功能开发复盘、源码讲解、知识点学习和问题排查，写成一篇可以直接发表的高质量中文知识文章（公众号、知乎、X 长文等），同时交付只给作者看的发布前核验记录，默认配封面与解释图；支持按需改编小红书、微博，组合个人写作风格与视觉品牌，能从初稿/终稿对比学习作者习惯，也能在用户发来人物图并明确要求时建立个人视觉品牌。Use for turning feature retrospectives, codebase explanations, concepts and troubleshooting into one publishable article with a fact-check review and images, and for building a personal visual brand kit from a character image on explicit request.
 license: MIT
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # AI Knowledge
@@ -58,7 +58,7 @@ metadata:
 
 ## 6. 配图
 
-默认制作一张封面和 2–4 张解释图，每张图只回答一个问题。按 [视觉品牌加载](references/visual-brand-loading.md) 选择品牌，按 [配图与资产验收](references/visual-planning.md) 设计、制作、导出 PNG 并登记 `assets/manifest.json`。图只在实际存在且基础检查通过后嵌入文章；没有生图工具时做程序化图解，人物图写成待制作项记在 review.md。
+默认制作一张封面和 2–4 张解释图，每张图只回答一个问题。按 [视觉品牌加载](references/visual-brand-loading.md) 选择品牌，按 [美术方向](references/visual-art-direction.md) 统一材质、线条、主色和版式，按 [配图与资产验收](references/visual-planning.md) 设计、制作、导出 PNG 并登记 `assets/manifest.json`。做完把本篇的图放在一起检查一遍。图只在实际存在且基础检查通过后嵌入文章；没有生图工具时做程序化图解，人物图写成待制作项记在 review.md。
 
 ## 7. 编辑三遍
 
@@ -86,6 +86,6 @@ metadata:
 
 ## 建立视觉品牌（按需）
 
-用户发来一张人物或角色图，**并且**明确要求用它建立视觉品牌、个人资产或 Brand Kit 时，按 [建立视觉品牌](references/visual-brand-setup.md) 执行：问三个问题，在个人配置目录的 `brands/<brand-id>/` 生成草稿，可选生成三视图和场景候选，用户确认后才自动使用。只发图、写文章时附带的图片、一次性的风格参考都不启动这个流程。
+用户发来一张人物或角色图，**并且**明确要求用它建立视觉品牌、个人资产或 Brand Kit 时，按 [建立视觉品牌](references/visual-brand-setup.md) 执行：问三个问题，在个人配置目录的 `brands/<brand-id>/` 生成草稿和视觉语言提案，可选生成三视图、场景候选并做四图测试，用户确认后才自动使用。只发图、写文章时附带的图片、一次性的风格参考都不启动这个流程。
 
 正常写作不读学习日志、不运行分析脚本。不自动发布、Commit、Push 或全局安装；不修改业务代码；不直接写用户 Vault，除非用户指定它为输出位置。

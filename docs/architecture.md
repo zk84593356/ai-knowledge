@@ -38,11 +38,12 @@ v0.4.0 只交付一篇可以直接发表的 article.md，把所有生产信息�
 | feature-analysis.md / concept-explanation.md / problem-review.md | 各模式的证据收集方法，以及从研究到文章的转换 | 对应模式 |
 | visual-brand-loading.md | 品牌选择、关闭、替换与回退 | 配图时（默认） |
 | visual-planning.md | 选图、版式、手机宽度检查、PNG 导出、manifest 台账 | 配图时（默认） |
+| visual-art-direction.md | 九条审美公式、谁来画什么、出图说明、自检、四图测试、学习别人作品的边界 | 配图时（默认）、建立品牌时 |
 | style-loading.md / style-application.md | 公共技法与个人规则的组合、覆盖、回退 | 写作时 |
 | personal-experience.md | 少量可跳过的经历问题、公开范围 | 确需真实经历时 |
 | style-analysis.md / style-reflection.md / style-source-update.md | 多篇风格分析、初稿/终稿复盘、个人风格写回 | 用户请求时 |
 | visual-brand-setup.md | 用一张人物图建立视觉品牌：触发条件、三个问题、草稿、候选、确认 | 用户发图并明确要求时 |
-| assets/templates/ | article.md、review.md 及风格档案、规则、复盘、经历模板；`brand/` 下是视觉品牌的四个模板 | 写对应产物时 |
+| assets/templates/ | article.md、review.md、出图说明及风格档案、规则、复盘、经历模板；`brand/` 下是视觉品牌的四个模板 | 写对应产物时 |
 | scripts/ | 只读辅助：analyze_style.py、style_learning.py、visual_assets.py | 可选，Python 3.10+ 标准库 |
 
 ## 个人配置不随包分发
@@ -85,5 +86,8 @@ Skill 不依赖 Codex 专用 API。文件读取、联网、写文件、生图和
 - v0.3.0：视觉品牌、视觉计划与资产检查。
 - v0.4.0：改为一篇可发表文章加发布前核验记录，默认配图；个人配置移出 Skill，放到使用者自己的目录。
 - v0.5.0：视觉品牌精简为四个文件；支持用一张人物图建立品牌、按名字选用品牌，草稿确认后才自动使用。
+- v0.6.0：审美方法论进入公共 Skill（美术方向、出图说明模板、视觉语言、四图测试、风格样板）；生图工具可以写短标题但必须逐字核对，数据图比例必须核实。
+
+审美方法放在公共 Skill，具体答案放在各自的品牌里：方法对任何角色都适用，换一个新角色只需要填自己的材质、主色和签名图形；某个品牌的颜色和图形写进公共规则，所有人的图就会长得一样，也会带出私有资产。
 
 历史验收记录中提到的已删除文件保留为纯文本路径。

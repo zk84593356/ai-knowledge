@@ -66,6 +66,10 @@ Claude Code、Cursor、OpenCode 可用同一安装源，并按 CLI 支持的 `-a
 
 个人写作规则和视觉品牌不在 Skill 里，安装和更新 Skill 都不会碰它们。Skill 按顺序查找：请求里明确给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → `%USERPROFILE%\.ai-knowledge\personal\`。都没有时用公共写作技法和通用图解。默认视觉品牌在其中的 `visual\`，其他品牌在 `brands\<brand-id>\`。
 
+## 从 v0.5.0 升级到 v0.6.0
+
+格式兼容，已有品牌不用转换，`kit` 检查照常通过。新版 style.md 模板多了"视觉语言"和"风格样板"两节；旧品牌没有这两节时，配图按美术方向的通用公式做。想补上时，可以让助手按模板起草视觉语言提案，再做一次四图测试。品牌图片新增 `sample` 角色（`assets/samples/`），用于登记风格样板。
+
 ## 从 v0.4.0 升级到 v0.5.0
 
 v0.5.0 的视觉品牌只认精简格式（`brand-kit.json` 的 `schemaVersion` 为 `"2"`，外加 character.md、style.md、provenance.md）。旧格式的品牌会被当作无效，回退通用图解，不会报错中断写作。转换方法：先把旧品牌目录整体备份，再按 `skills/ai-knowledge/assets/templates/brand/` 的四个模板合并原来的规范文件，图片原样保留，最后运行 `python skills/ai-knowledge/scripts/visual_assets.py kit <品牌目录>` 确认通过。也可以直接让助手按 [建立视觉品牌](../skills/ai-knowledge/references/visual-brand-setup.md) 的格式转换。

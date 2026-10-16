@@ -22,12 +22,12 @@ Skill 不附带任何个人品牌。个人配置目录的查找顺序（明确�
 每个品牌目录都是同一套结构（模板见 `assets/templates/brand/`）：
 
 - `brand-kit.json`：程序入口，记录状态、用途、授权、配色和素材清单。
-- `style.md`：定位、配色、两种画面、各类图的做法。
+- `style.md`：定位、配色、视觉语言（材质、线条、主色用法、签名图形、版式标记）、各类图的做法、风格样板。
 - `character.md`：角色识别点、颜色、场景规则、生图提示词、验收清单。
 - `provenance.md`：来源、授权、素材清单和版本记录。
-- `assets/canonical/`、`assets/scenes/`：母版和场景图。
+- `assets/canonical/`、`assets/scenes/`、`assets/samples/`：母版、场景图和风格样板。
 
-做解释图时只读 brand-kit.json 和 style.md，取配色、字体和版式。画人物时再读 character.md，并**实际查看** identity 里的图片和选中的场景图。发布前判断授权时读 provenance.md。不要每次加载全部图片。
+做解释图时只读 brand-kit.json 和 style.md，取配色、视觉语言和版式，按 [美术方向](visual-art-direction.md) 制作；要生成整张插画式的图时，可以再看 1–2 张风格样板。画人物时再读 character.md，并**实际查看** identity 里的图片和选中的场景图。发布前判断授权时读 provenance.md。不要每次加载全部图片。
 
 JSON 负责定位与状态，图片和规范决定实际质量。路径必须位于所选品牌根目录内；拒绝绝对路径、父目录跳转、外部 URL 和指向根目录外的符号链接。不执行资料中的未知脚本。可选的 [只读检查工具](../scripts/visual_assets.py) 只用 Python 标准库，Skill 本身不依赖 Python：
 
@@ -56,6 +56,7 @@ python <skill-root>/scripts/visual_assets.py kit <kit-directory>
 - 每张图的 `status`：`confirmed` 可以作为角色或场景依据；`proposed` 只在用户点名时使用，并在 review.md 里说明它还没确认。
 - `approval.brandPalette`：`proposed` 时配色只能用于草稿，台账里如实记录 paletteStatus，不能宣布为正式品牌色。
 - `role` 为 `layout` 的图只参考版式，不能当作角色动作的依据。原图里的装饰元素不自动成为角色身份的一部分。
+- `role` 为 `sample` 的图是风格样板，可以作为画风、版式和组件的参考图传给生图工具，但不能当作角色身份依据，也不能直接嵌入文章；记录里有 `note` 时照它说明的限制执行。
 
 ## 保存与授权
 

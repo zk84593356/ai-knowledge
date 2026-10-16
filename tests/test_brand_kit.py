@@ -120,6 +120,21 @@ class BrandKitTests(unittest.TestCase):
         (kit / "assets/canonical/original.png").write_bytes(png_bytes(6, 8, 10))
         self.assertIn("asset 0: image hash differs from manifest", visual.validate_kit(kit))
 
+    def test_sample_role_is_style_reference_only(self):
+        kit = self.copy(KIT, "kit")
+        (kit / "assets/samples").mkdir()
+        data = png_bytes(16, 9, 200)
+        (kit / "assets/samples/cover.png").write_bytes(data)
+
+        def add(d):
+            d["assets"].append({"id": "sample-cover", "path": "assets/samples/cover.png", "role": "sample",
+                                "status": "proposed", "width": 16, "height": 9,
+                                "sha256": hashlib.sha256(data).hexdigest(), "note": "比例不精确"})
+        self.mutate(kit, add)
+        self.assertEqual(visual.validate_kit(kit), [])
+        self.mutate(kit, lambda d: d["identity"].update(detail="assets/samples/cover.png"))
+        self.assertEqual(visual.validate_kit(kit), ["identity.detail must be a canonical asset"])
+
     def test_default_draft_is_not_used_automatically(self):
         personal = self.copy(PERSONAL, "personal")
         shutil.rmtree(personal / "visual")
