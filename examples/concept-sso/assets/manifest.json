@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1",
+  "brandId": "generic",
+  "kitVersion": "none",
+  "paletteStatus": "none",
+  "batch": "2026-10-16-b",
+  "status": "draft",
+  "assets": [
+    {
+      "id": "cover-svg",
+      "type": "cover",
+      "path": "./assets/cover.svg",
+      "status": "generated",
+      "source": "文章标题与核心判断；右侧为身份服务与两个网站的几何示意，无人物",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1600,
+      "height": 900,
+      "sha256": "6fb572ca66350ad7472223e89c0c0fcad88be77a4a1de0a187fe73e830e70e52",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "cover-png",
+      "type": "cover",
+      "path": "./assets/cover.png",
+      "status": "generated",
+      "source": "文章标题与核心判断；右侧为身份服务与两个网站的几何示意，无人物",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 3200,
+      "height": 1800,
+      "sha256": "7dfa05c453b76857f9b32c3eba824f567f962d2129ef34c892faaa9c9606bc09",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "sso-sessions-svg",
+      "type": "infographic",
+      "path": "./assets/sso-sessions.svg",
+      "status": "generated",
+      "source": "review.md F01–F04：Cookie 按站点发送、三方角色、三个会话",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1080,
+      "height": 1080,
+      "sha256": "23f085eabeac7bd9ad7521d69f1ef7a3e3ba459764586e8275e7da6a8a0f0869",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "sso-sessions-png",
+      "type": "infographic",
+      "path": "./assets/sso-sessions.png",
+      "status": "generated",
+      "source": "review.md F01–F04：Cookie 按站点发送、三方角色、三个会话",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 2160,
+      "height": 2160,
+      "sha256": "9dfd3015b94d591eed2de35f7b44087f475a17fccbb2e5d727b7ad6856648408",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "sso-second-site-svg",
+      "type": "infographic",
+      "path": "./assets/sso-second-site.svg",
+      "status": "generated",
+      "source": "review.md F05–F07：第二个网站的四步登录",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1080,
+      "height": 1128,
+      "sha256": "67afd618e95fb0915f74eb7b2b5816b5b671060c3cc5c685f713980a69aa0abf",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "sso-second-site-png",
+      "type": "infographic",
+      "path": "./assets/sso-second-site.png",
+      "status": "generated",
+      "source": "review.md F05–F07：第二个网站的四步登录",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 2160,
+      "height": 2256,
+      "sha256": "2be7cb524af683b6ea5d7bf525c74b46d19ded7cb77a43183e240675311300f6",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "sso-logout-svg",
+      "type": "infographic",
+      "path": "./assets/sso-logout.svg",
+      "status": "generated",
+      "source": "review.md F13–F14：只退出一个网站时三个会话的状态",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1080,
+      "height": 1080,
+      "sha256": "ae03835e77b4306ca49e210c2ff40b9e3e75886361503b6f6974644cb9d80105",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "sso-logout-png",
+      "type": "infographic",
+      "path": "./assets/sso-logout.png",
+      "status": "generated",
+      "source": "review.md F13–F14：只退出一个网站时三个会话的状态",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 2160,
+      "height": 2160,
+      "sha256": "a06449e32f73539d23a61ff363ecc20f63ddae45972ec872efcf5259f187b580",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    }
+  ]
+}

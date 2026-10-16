@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+.test-tools/
+tests/.tmp/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+.idea/

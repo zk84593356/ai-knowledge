@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1570" viewBox="0 0 1080 1570"><defs><filter id="sh" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/></filter></defs>
+<rect x="0" y="0" width="1080" height="1570" rx="0" fill="#111827"/>
+<text x="60" y="110" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="52" font-weight="800" fill="#FFFFFF" text-anchor="start">三个随机值在哪生成、在哪被检查</text>
+<text x="60" y="168" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="400" fill="#B8C2D0" text-anchor="start">原件只存在服务端会话里，经过浏览器的只有副本或摘要</text>
+<rect x="60" y="214" width="960" height="232" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="276" r="32" fill="#4A5A70"/>
+<text x="122" y="289" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="180" y="270" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#B8C2D0" text-anchor="start">你的后端 → 浏览器 → 身份服务</text>
+<rect x="840.0" y="236" width="156" height="50" rx="25.0" fill="#111827" stroke="#B8C2D0" stroke-width="3"/>
+<text x="858" y="272" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="30" font-weight="600" fill="#B8C2D0" text-anchor="start">经浏览器</text>
+<text x="180" y="326" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">生成三个随机值，原件存进会话，再跳转</text>
+<rect x="180" y="364" width="216" height="56" rx="14" fill="#111827" stroke="#FCD34D" stroke-width="3"/>
+<text x="200" y="403" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#FCD34D" text-anchor="start">state</text>
+<text x="310" y="403" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">副本</text>
+<rect x="412" y="364" width="216" height="56" rx="14" fill="#111827" stroke="#60A5FA" stroke-width="3"/>
+<text x="432" y="403" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#60A5FA" text-anchor="start">nonce</text>
+<text x="542" y="403" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">副本</text>
+<rect x="644" y="364" width="293" height="56" rx="14" fill="#111827" stroke="#A7F3D0" stroke-width="3"/>
+<text x="664" y="403" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#A7F3D0" text-anchor="start">challenge</text>
+<text x="851" y="403" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">摘要</text>
+<line x1="122" y1="450" x2="122" y2="468" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 462 L122 478 L133 462" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="480" width="960" height="232" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="542" r="32" fill="#4A5A70"/>
+<text x="122" y="555" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="180" y="536" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#B8C2D0" text-anchor="start">身份服务 → 浏览器 → 你的回调</text>
+<rect x="840.0" y="502" width="156" height="50" rx="25.0" fill="#111827" stroke="#B8C2D0" stroke-width="3"/>
+<text x="858" y="538" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="30" font-weight="600" fill="#B8C2D0" text-anchor="start">经浏览器</text>
+<text x="180" y="592" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">验证用户，带着一次性 code 跳回</text>
+<rect x="180" y="630" width="280" height="56" rx="14" fill="#111827" stroke="#FCD34D" stroke-width="3"/>
+<text x="200" y="669" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#FCD34D" text-anchor="start">state</text>
+<text x="310" y="669" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">原样带回</text>
+<rect x="476" y="630" width="229" height="56" rx="14" fill="#111827" stroke="#B8C2D0" stroke-width="3"/>
+<text x="496" y="669" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#B8C2D0" text-anchor="start">code</text>
+<text x="587" y="669" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">一次性</text>
+<line x1="122" y1="716" x2="122" y2="734" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 728 L122 744 L133 728" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="746" width="960" height="232" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="808" r="32" fill="#FCD34D"/>
+<text x="122" y="821" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="middle">3</text>
+<text x="180" y="802" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#FCD34D" text-anchor="start">你的回调</text>
+<text x="180" y="858" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">先核对 state，再兑换 code</text>
+<rect x="180" y="896" width="384" height="56" rx="14" fill="#111827" stroke="#FCD34D" stroke-width="3"/>
+<text x="200" y="935" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#FCD34D" text-anchor="start">state</text>
+<text x="310" y="935" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">你的代码核对</text>
+<path d="M510 925.0 L519.88 934.88 L536 915.12" fill="none" stroke="#FCD34D" stroke-width="4.16" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="122" y1="982" x2="122" y2="1000" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 994 L122 1010 L133 994" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="1012" width="960" height="232" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="1074" r="32" fill="#A7F3D0"/>
+<text x="122" y="1087" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="middle">4</text>
+<text x="180" y="1068" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#60A5FA" text-anchor="start">你的后端 → 身份服务</text>
+<rect x="810.0" y="1034" width="186" height="50" rx="25.0" fill="#111827" stroke="#60A5FA" stroke-width="3"/>
+<text x="828" y="1070" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="30" font-weight="600" fill="#60A5FA" text-anchor="start">服务器直连</text>
+<text x="180" y="1124" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">交出 code 和 verifier 原件</text>
+<rect x="180" y="1162" width="506" height="56" rx="14" fill="#111827" stroke="#A7F3D0" stroke-width="3"/>
+<text x="200" y="1201" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#A7F3D0" text-anchor="start">verifier</text>
+<text x="368" y="1201" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">身份服务核对摘要</text>
+<path d="M632 1191.0 L641.88 1200.88 L658 1181.12" fill="none" stroke="#A7F3D0" stroke-width="4.16" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="122" y1="1248" x2="122" y2="1266" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 1260 L122 1276 L133 1260" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="1278" width="960" height="232" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="1340" r="32" fill="#60A5FA"/>
+<text x="122" y="1353" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="180" y="1334" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#60A5FA" text-anchor="start">你的后端</text>
+<rect x="750.0" y="1300" width="246" height="50" rx="25.0" fill="#60A5FA"/>
+<text x="768" y="1336" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="30" font-weight="600" fill="#111827" text-anchor="start">通过才记下用户</text>
+<text x="180" y="1390" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">验证 ID Token 的签名、iss、aud、exp</text>
+<rect x="180" y="1428" width="480" height="56" rx="14" fill="#111827" stroke="#60A5FA" stroke-width="3"/>
+<text x="200" y="1467" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="32" font-weight="700" fill="#60A5FA" text-anchor="start">nonce</text>
+<text x="310" y="1467" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="start">与会话里的原件比对</text>
+<path d="M606 1457.0 L615.88 1466.88 L632 1447.12" fill="none" stroke="#60A5FA" stroke-width="4.16" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

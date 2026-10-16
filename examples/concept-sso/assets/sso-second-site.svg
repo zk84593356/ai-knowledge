@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1128" viewBox="0 0 1080 1128"><defs><filter id="sh" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/></filter></defs>
+<rect x="0" y="0" width="1080" height="1128" rx="0" fill="#111827"/>
+<text x="60" y="110" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="52" font-weight="800" fill="#FFFFFF" text-anchor="start">报销系统认出你的四步</text>
+<text x="60" y="168" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="400" fill="#B8C2D0" text-anchor="start">你只看到地址栏跳了一下</text>
+<rect x="60" y="214" width="960" height="188" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="276" r="32" fill="#4A5A70"/>
+<text x="122" y="289" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="180" y="270" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#B8C2D0" text-anchor="start">浏览器 → 报销系统</text>
+<text x="180" y="326" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">报销系统找不到自己的 Cookie</text>
+<text x="180" y="376" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="400" fill="#B8C2D0" text-anchor="start">让浏览器去身份服务，说明：我是谁，验完送回哪里</text>
+<line x1="122" y1="406" x2="122" y2="424" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 418 L122 434 L133 418" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="436" width="960" height="188" rx="24" fill="#1F2937" stroke="#FCD34D" stroke-width="3" filter="url(#sh)"/>
+<circle cx="122" cy="498" r="32" fill="#FCD34D"/>
+<text x="122" y="511" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="middle">2</text>
+<text x="180" y="492" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#60A5FA" text-anchor="start">浏览器 → 身份服务</text>
+<rect x="690.0" y="458" width="306" height="50" rx="25.0" fill="#FCD34D"/>
+<text x="708" y="494" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="30" font-weight="600" fill="#111827" text-anchor="start">免输密码发生在这里</text>
+<text x="180" y="548" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">带上身份服务的 Cookie，会话有效</text>
+<text x="180" y="598" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="400" fill="#B8C2D0" text-anchor="start">不显示密码框；会话过期时才要你再输一次</text>
+<line x1="122" y1="628" x2="122" y2="646" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 640 L122 656 L133 640" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="658" width="960" height="188" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="720" r="32" fill="#4A5A70"/>
+<text x="122" y="733" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="180" y="714" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#B8C2D0" text-anchor="start">身份服务 → 浏览器 → 报销系统</text>
+<text x="180" y="770" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">带回一份写给报销系统的凭证</text>
+<text x="180" y="820" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="400" fill="#B8C2D0" text-anchor="start">OIDC 里是一次性授权码，后端再用它换 ID Token</text>
+<line x1="122" y1="850" x2="122" y2="868" stroke="#4A5A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M111 862 L122 878 L133 862" fill="none" stroke="#4A5A70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="60" y="880" width="960" height="188" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<circle cx="122" cy="942" r="32" fill="#4A5A70"/>
+<text x="122" y="955" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="36" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="180" y="936" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="600" fill="#A7F3D0" text-anchor="start">报销系统</text>
+<text x="180" y="992" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="start">验证签发者、收件人和有效期</text>
+<text x="180" y="1042" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="400" fill="#B8C2D0" text-anchor="start">通过后建立自己的会话，发第三个 Cookie</text>
+</svg>

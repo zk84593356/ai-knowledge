@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1",
+  "brandId": "generic",
+  "kitVersion": "none",
+  "paletteStatus": "none",
+  "batch": "2026-10-16-b",
+  "status": "draft",
+  "assets": [
+    {
+      "id": "cover-svg",
+      "type": "cover",
+      "path": "./assets/cover.svg",
+      "status": "generated",
+      "source": "文章标题与核心判断；右侧为锁的几何示意，无人物",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1600,
+      "height": 900,
+      "sha256": "023df4f9be1ded4bc23af34bcd1f372b2d344fb87a6aef417241395b56ea2450",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "cover-png",
+      "type": "cover",
+      "path": "./assets/cover.png",
+      "status": "generated",
+      "source": "文章标题与核心判断；右侧为锁的几何示意，无人物",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 3200,
+      "height": 1800,
+      "sha256": "08acd58739883ed892657a41ec545ff6de3953be8b157f5b9f8e8db4b413a047",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "oidc-flow-svg",
+      "type": "infographic",
+      "path": "./assets/oidc-flow.svg",
+      "status": "generated",
+      "source": "review.md F03–F09：login.py 的 begin/callback 与适配器约定",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1080,
+      "height": 1570,
+      "sha256": "6e6be73feaf4808f6b65442c1b842df6096f6a345a0d867395159086acd05b31",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "oidc-flow-png",
+      "type": "infographic",
+      "path": "./assets/oidc-flow.png",
+      "status": "generated",
+      "source": "review.md F03–F09：login.py 的 begin/callback 与适配器约定",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 2160,
+      "height": 3140,
+      "sha256": "1d36b1af0215b80c02256c325f5169562106422746ad5b7b0348224872c946a7",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "oidc-three-guards-svg",
+      "type": "infographic",
+      "path": "./assets/oidc-three-guards.svg",
+      "status": "generated",
+      "source": "review.md F05–F12：三个随机值的绑定对象、检查点与防护",
+      "references": [],
+      "method": "手写自包含 SVG（Python 生成，通用配色，字体 Noto Sans SC / Cascadia Code）",
+      "width": 1080,
+      "height": 1294,
+      "sha256": "c8bdbd91d9e6d97863ba7e22576e51e119cd6abdd71b3c596c3621b4c9e02c70",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    },
+    {
+      "id": "oidc-three-guards-png",
+      "type": "infographic",
+      "path": "./assets/oidc-three-guards.png",
+      "status": "generated",
+      "source": "review.md F05–F12：三个随机值的绑定对象、检查点与防护",
+      "references": [],
+      "method": "由同名 SVG 经 Microsoft Edge（Playwright）以 2 倍像素密度导出",
+      "width": 2160,
+      "height": 2588,
+      "sha256": "9b59210b5b19584adafbb64b73b3b62cdc698b8e7a69bf2aa3d0b3ba2e9cc6fe",
+      "review": {
+        "identity": "na",
+        "knowledge": "pass",
+        "readability": "pass",
+        "rights": "public",
+        "aesthetic": "pending"
+      }
+    }
+  ]
+}

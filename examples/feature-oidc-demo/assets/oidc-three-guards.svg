@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1294" viewBox="0 0 1080 1294"><defs><filter id="sh" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/></filter></defs>
+<rect x="0" y="0" width="1080" height="1294" rx="0" fill="#111827"/>
+<text x="60" y="110" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="52" font-weight="800" fill="#FFFFFF" text-anchor="start">三个随机值的分工</text>
+<text x="60" y="168" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="400" fill="#B8C2D0" text-anchor="start">防护有重叠，检查点各不相同，所以三个都留着</text>
+<rect x="60" y="220" width="960" height="318" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<rect x="60" y="220" width="16" height="318" rx="8" fill="#FCD34D"/>
+<text x="110" y="294" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="48" font-weight="700" fill="#FCD34D" text-anchor="start">state</text>
+<line x1="110" y1="322" x2="990" y2="322" stroke="#4A5A70" stroke-width="2" stroke-linecap="round"/>
+<rect x="110" y="344" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="379" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#FCD34D" text-anchor="middle">绑定</text>
+<text x="228" y="380" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">这个浏览器的会话与这次登录请求</text>
+<rect x="110" y="408" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="443" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#FCD34D" text-anchor="middle">检查</text>
+<text x="228" y="444" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">你的回调，在兑换 code 之前</text>
+<rect x="110" y="472" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="507" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#FCD34D" text-anchor="middle">挡住</text>
+<text x="228" y="508" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">登录 CSRF：被塞进别人的登录</text>
+<rect x="60" y="568" width="960" height="318" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<rect x="60" y="568" width="16" height="318" rx="8" fill="#60A5FA"/>
+<text x="110" y="642" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="48" font-weight="700" fill="#60A5FA" text-anchor="start">nonce</text>
+<line x1="110" y1="670" x2="990" y2="670" stroke="#4A5A70" stroke-width="2" stroke-linecap="round"/>
+<rect x="110" y="692" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="727" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#60A5FA" text-anchor="middle">绑定</text>
+<text x="228" y="728" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">这次登录与它换来的 ID Token</text>
+<rect x="110" y="756" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="791" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#60A5FA" text-anchor="middle">检查</text>
+<text x="228" y="792" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">你的后端，在验证 ID Token 时</text>
+<rect x="110" y="820" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="855" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#60A5FA" text-anchor="middle">挡住</text>
+<text x="228" y="856" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">并非本次签发的 ID Token</text>
+<rect x="60" y="916" width="960" height="318" rx="24" fill="#1F2937" filter="url(#sh)"/>
+<rect x="60" y="916" width="16" height="318" rx="8" fill="#A7F3D0"/>
+<text x="110" y="990" font-family="Cascadia Code, Consolas, Menlo, monospace" font-size="48" font-weight="700" fill="#A7F3D0" text-anchor="start">PKCE</text>
+<line x1="110" y1="1018" x2="990" y2="1018" stroke="#4A5A70" stroke-width="2" stroke-linecap="round"/>
+<rect x="110" y="1040" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="1075" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#A7F3D0" text-anchor="middle">绑定</text>
+<text x="228" y="1076" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">发起登录的一方与 code 的兑换</text>
+<rect x="110" y="1104" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="1139" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#A7F3D0" text-anchor="middle">检查</text>
+<text x="228" y="1140" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">身份服务，在兑换令牌时</text>
+<rect x="110" y="1168" width="92" height="48" rx="12" fill="#273449"/>
+<text x="156" y="1203" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="32" font-weight="700" fill="#A7F3D0" text-anchor="middle">挡住</text>
+<text x="228" y="1204" font-family="Noto Sans SC, Source Han Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="500" fill="#FFFFFF" text-anchor="start">截获的 code 被拿去兑换令牌</text>
+</svg>

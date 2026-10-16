@@ -1,0 +1,2 @@
+# manifest.json records SVG hashes; keep exact bytes on every platform.
+*.svg -text
