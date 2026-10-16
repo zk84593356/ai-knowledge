@@ -2,16 +2,365 @@
 
 **把一个问题研究透，写成一篇读者愿意读完、作者敢署名发表的文章。**
 
-ai-knowledge 是一个 Agent Skill，供 Codex 等支持 Agent Skills 的助手使用。它把功能开发、源码阅读、概念学习和问题排查，写成一篇可以直接发到公众号、知乎、X 长文的中文知识文章，同时交给作者一份发布前核验记录。当前开发版本为 v0.6.0。
-
-每个主题交付：
+ai-knowledge 是一个 Agent Skill，装进 Codex、Claude Code、Cursor 等支持 Agent Skills 的 AI 助手后使用。你把做过的功能、想学的知识、踩过的坑交给它，它会先查证事实，再写成一篇可以直接发到公众号、知乎、X 长文的中文文章，配好封面和解释图，并附上一份只给你看的发布前核验记录。当前版本 v0.6.0。
 
 ```text
-docs/knowledge/<topic-slug>/
-├── article.md   # 唯一要发表的文章：复制到平台即可使用，不夹带生产信息
-├── review.md    # 只给作者看：证据表、公开安全过滤、可补充的亲身经历、配图状态、标题备选
-└── assets/      # 封面 + 2–4 张解释图（PNG 与可编辑 SVG）和 manifest.json
+                              ai-knowledge
+                                   │
+             ┌─────────────────────┼─────────────────────┐
+             ▼                     ▼                     ▼
+          新功能                 新知识                 新问题
+         (Feature)             (Concept)             (Problem)
+             │                     │                     │
+         Git 仓库               一个概念               报错信息
+         Commit / Diff          网页链接               日志
+         源码 / 配置 / 测试     PDF / 文档             排查过程
+                                视频字幕或文字稿       聊天记录 / 截图
+             │                     │                     │
+             └─────────────────────┼─────────────────────┘
+                                   ▼
+                     docs/knowledge/<主题>/
+                     ├── article.md   可以直接发表的文章
+                     ├── review.md    只给你看的核验记录
+                     └── assets/      封面 + 2–4 张解释图
 ```
+
+再往上一层，它还会**学你**：
+
+```text
+   你写过的文章 ──┐
+   初稿 vs 终稿 ──┼──▶ 你的写作规则 ──┐
+   一句偏好     ──┘                    ├──▶ 以后每篇文章都像你写的、配图都认得出是你
+   一张人物图   ────▶ 你的视觉品牌 ────┘
+```
+
+写作规则和视觉品牌都存在你自己电脑上的个人配置目录里，不进 Skill，也不进任何仓库。
+
+## 目录
+
+- [5 分钟上手](#5-分钟上手)
+- [玩法：复制就能用的提示词](#玩法复制就能用的提示词)
+- [打造你的专属品牌人物](#打造你的专属品牌人物)
+- [个人配置放在哪里才生效](#个人配置放在哪里才生效)
+- [先看成品](#先看成品)
+- [它怎样写一篇文章](#它怎样写一篇文章)
+- [能做什么、不能做什么](#能做什么不能做什么)
+
+## 5 分钟上手
+
+### 1. 安装
+
+需要 Node.js（skills 安装器要求 22.20 或更高）。Skill 本身不需要 Python、API Key 或其他依赖。
+
+```powershell
+# Codex，全局安装（所有项目可用）
+npx skills add zk84593356/ai-knowledge -g -a codex -s ai-knowledge
+
+# Claude Code / Cursor / OpenCode，把 -a 换成对应的宿主
+npx skills add zk84593356/ai-knowledge -g -a claude-code -s ai-knowledge
+
+# 以后更新
+npx skills update ai-knowledge -g
+```
+
+不想用安装器，也可以把仓库里的整个 `skills/ai-knowledge/` 文件夹复制到宿主的技能目录。Codex 的用户级目录是 `~/.agents/skills/ai-knowledge/`；其他宿主以它自己的文档为准。复制时保留整个目录，不要只复制 SKILL.md。装好后重开助手或新建会话。更多安装方式和常见问题见 [安装文档](docs/installation.md)。
+
+### 2. 写第一篇
+
+在任意项目里打开助手，粘贴：
+
+```text
+$ai-knowledge 什么是单点登录（SSO）？面向编程初学者讲清楚，允许联网查可靠资料。
+```
+
+> `$ai-knowledge` 是 Codex 的调用写法。其他宿主可以在句首写"用 ai-knowledge Skill："，或按宿主自己的方式调用。下面所有提示词都一样。
+
+### 3. 看产物
+
+文章写在**当前项目**的 `docs/knowledge/<主题>/` 下：
+
+- `article.md`：唯一要发表的成品，复制到平台就能用。
+- `review.md`：只给你看。里面有每条结论的依据、哪些内容出于安全考虑没写进文章、建议你补充亲身经历的位置、配图状态和备选标题。
+- `assets/`：封面和解释图。
+
+写稿的助手不会给自己的结论盖章，所以核验记录里的条目默认都是"未核验"。发表前建议独立复查一遍，做法见下面的玩法 5。
+
+## 玩法：复制就能用的提示词
+
+方括号 `[ ]` 里的内容换成你自己的，其余原样粘贴。
+
+### 玩法 1：把做完的功能写成文章（Feature）
+
+在项目目录里打开助手：
+
+```text
+$ai-knowledge 把当前项目的 [登录功能] 写成一篇文章，面向 [Java 初学者]，讲清楚它是怎么设计的、为什么这样设计。
+```
+
+只想讲某一次改动：
+
+```text
+$ai-knowledge 分析从 [提交号 A] 到 [提交号 B] 的改动，写成一篇功能复盘文章，讲清改了什么、为什么改、踩了什么坑。
+```
+
+助手会读相关的代码、配置和测试，把每个项目事实对应到文件和行号，记在 review.md 里。公司名、内部域名、类名和私有代码不会进文章；需要代码时，它会重写一段原创演示。
+
+### 玩法 2：学一个新知识（Concept）
+
+```text
+$ai-knowledge 什么是 [OAuth 2.0]？面向 [刚入门的后端]，允许联网查官方文档和标准，standard 深度。
+```
+
+把你看过的资料一起交给它：
+
+```text
+$ai-knowledge 根据这几份资料讲清楚 [向量数据库是什么]，资料之间有冲突的地方要指出来：
+[网页链接 1]
+[网页链接 2]
+[本地 PDF 或 Markdown 文件路径]
+```
+
+看完一个视频想整理成文章（先导出字幕或文字稿，助手不能直接看视频）：
+
+```text
+$ai-knowledge 这是一个视频的文字稿，帮我整理成一篇讲清 [主题] 的文章。文字稿里的观点要和权威资料核对，不能确认的写窄或标出来：
+[粘贴文字稿，或给出文件路径]
+```
+
+非技术主题也可以：
+
+```text
+$ai-knowledge 什么是 [机会成本]？面向普通读者，用 [选择学习时间] 的例子解释，concise 深度，不需要代码。
+```
+
+### 玩法 3：复盘一次踩坑（Problem）
+
+```text
+$ai-knowledge 帮我复盘这次 [部署失败]。只根据我提供的材料，区分事实和推测，没解决的部分写成阶段性复盘：
+[粘贴报错和日志]
+[粘贴或附上排查时的聊天记录、截图]
+```
+
+日志原文只留在 review.md，文章里写整理后的现象。助手不会把建议写成已经做过的操作，也不会把"可能是这个原因"写成定论。
+
+### 玩法 4：调整读者、深度、语言和配图
+
+```text
+$ai-knowledge 什么是 [SSO]？面向有两年经验的后端，deep 深度。
+$ai-knowledge 什么是 [SSO]？concise 深度，不要图。
+$ai-knowledge Explain [SSO] for beginners in English. Put the files in ./learning/sso.
+$ai-knowledge 什么是 [SSO]？配图不用我的个人品牌，用通用图解。
+$ai-knowledge 什么是 [SSO]？只用公共写作规则，不用我的个人风格。
+```
+
+深度有三档：concise、standard（默认）、deep。深度只改变展开程度，查证和隐私要求不变。
+
+### 玩法 5：发表前把关
+
+换一个新会话独立复查（写稿的那个会话不适合复查自己）：
+
+```text
+$ai-knowledge 请独立复查 docs/knowledge/[主题]/review.md 的事实核验，逐条对照依据，更新核验状态，列出需要我处理的问题。
+```
+
+补一段自己的真实经历（review.md 里列出了最适合放经历的位置和建议问题）：
+
+```text
+$ai-knowledge 我补充一段亲身经历：[你的经历]。请把它写进 docs/knowledge/[主题]/article.md 的 [第二节]，其余内容不动。
+```
+
+确认可以发了：
+
+```text
+$ai-knowledge docs/knowledge/[主题] 这篇可以发布了。
+```
+
+助手不会替你编造经历。只有你明确说可以发布，review.md 的状态才会改为 ready。
+
+### 玩法 6：一稿多发
+
+公众号、知乎、掘金、X 长文直接用 article.md。其他平台另写一份改编稿，主稿不动：
+
+```text
+$ai-knowledge 把 docs/knowledge/[主题]/article.md 改编成小红书版本：3–9 张竖版图，每张一个要点，配一段短文案。
+$ai-knowledge 给 docs/knowledge/[主题]/article.md 写一条微博，只放一个最有冲击力的结论和一张图，引导读者看长文。
+```
+
+### 玩法 7：更新一篇旧文章
+
+```text
+$ai-knowledge 更新 docs/knowledge/[主题]/ 这篇文章：[框架升级到了新版本 / 我发现第三节有个错误]。在原目录修改，保留创建日期，在 review.md 里记下改了什么。
+```
+
+不说"更新"或"改这篇"时，同名主题会在旁边新建一个带日期后缀的目录，旧文件保持原样。
+
+### 玩法 8：让文章越写越像你
+
+**从你写过的文章里提炼风格：**
+
+```text
+$ai-knowledge 分析这几篇我自己写的文章，提炼我的写作风格：句子长短、常用词、怎么过渡、怎么开头和结尾，每条都附上证据和例外。提炼出的规则先作为候选写进我的个人配置目录，我确认后再生效。
+[文章文件路径，或一个 ZIP]
+```
+
+**直接说出你的偏好：**
+
+```text
+$ai-knowledge 更新我的写作规则：不要用"赋能""抓手""闭环"这类词；段落不超过 4 句；结尾不写"希望对你有帮助"。这些是我明确的偏好，直接记为已确认。
+```
+
+**从你的修改里学习（最准的方式）：**
+
+```text
+$ai-knowledge 对比 [初稿路径] 和我改好的终稿 [终稿路径]，总结我的修改习惯，更新我的个人风格。
+```
+
+**看看现在记住了什么：**
+
+```text
+$ai-knowledge 列出我个人配置目录里已确认和候选的写作规则，各用一句话说明。
+```
+
+单篇文章里观察到的习惯先记为候选，你确认后才生效；你直接说出的偏好可以立即确认。规则写回你的个人配置目录，下次调用就生效，不用重装 Skill。别人的文章只能提炼成可借鉴的技巧，不会被当成"你的习惯"。
+
+### 玩法 9：给文章配上你的品牌人物
+
+建好品牌以后（见下一节），写文章时默认就会用它配图。也可以点名指定：
+
+```text
+$ai-knowledge 什么是 [SSO]？用 [blue-cat] 品牌配图。
+$ai-knowledge 什么是 [SSO]？封面复用 [desktop-work] 场景图，不要重新生成。
+```
+
+## 打造你的专属品牌人物
+
+一个好的品牌人物能让读者不看名字也认得出你的文章。第 0 步在 Skill 外准备人物图，之后每一步用一句话启动，第 2、3 步可以跳过。
+
+### 第 0 步：准备一张原创人物图
+
+这一步不需要 Skill，你可以自己画、找人约稿，或者用任何 AI 生图工具生成。用 AI 生成时可以粘贴下面这段：
+
+```text
+帮我设计一个原创的 2D Q 版角色，作为我的个人品牌形象，用在技术文章配图和视频里。
+- 性格关键词：[好奇、认真、有点呆萌]
+- 识别点（2–3 个，越独特越好）：[一撮翘起来的头发、竖条形的眼睛、一条蓝色围巾]
+- 主色（只选一个，以后会成为品牌色）：[蓝色 #4292EC]
+- 画法：干净的 2D 平涂、深色描边、大头短身
+- 画面：全身正面站姿，纯白背景，不要任何文字
+不要模仿任何已有的动漫、游戏或品牌角色。
+```
+
+好的品牌人物有三个特点：识别点少而鲜明；主色只有一个；剪影简单，缩成头像也认得出。别用知名 IP 或别人的角色，否则授权状态只能是"待确认"。用真人照片时，只能是你本人，并且你同意。
+
+### 第 1 步：用这张图建立品牌
+
+把图片发给助手（附件或文件路径），**并且明确说要建立品牌**：
+
+```text
+$ai-knowledge 用这张图建立我的视觉品牌。
+```
+
+它会一次问你三个问题，每个都可以跳过：
+
+```text
+名字：小蓝，ID 用 blue-cat
+来源：我用 [某某工具] 生成的
+用途：文章和视频都要
+```
+
+助手会在个人配置目录的 `brands/blue-cat/` 生成一套草稿：原图原样保存，写好角色规范、风格规范、来源说明和程序要读的 `brand-kit.json`。只发图不说要做什么，或者写文章时附带了截图，都不会启动这个流程。
+
+### 第 2 步（可选）：生成三视图和场景图
+
+```text
+$ai-knowledge 给 blue-cat 生成三视图（正面、侧面、背面）和 3 张场景候选：讲解、敲电脑、思考，其中一张是 16:9。先放进候选让我挑。
+```
+
+这一步需要宿主带有**能接收参考图**的生图工具，例如 Codex 的生图功能。没有这类工具时，助手只写好提示词，不会假装锁定了角色。生成的图先放在 `candidates/` 里，你挑中的才会登记。
+
+### 第 3 步（可选）：定视觉语言，做四图测试
+
+这一步决定你的配图"好不好看、像不像一套"：
+
+```text
+$ai-knowledge 给 blue-cat 起草视觉语言：提 2–3 个材质比喻让我挑，线条颜色取角色描边，主色取角色身上最醒目的颜色，从角色识别点里提取 2–3 个签名图形。然后用"[一个你熟悉的主题]"做一次四图测试：封面、流程图、数据图、插画各一张，拼成一张对比图给我看。
+```
+
+方法见 [美术方向](skills/ai-knowledge/references/visual-art-direction.md)：一个材质比喻、一支笔、一个只当工具用的主色、从角色身上提取的签名图形、固定的页眉页脚、角色当讲解员、字少字大、生图有规矩、整组验收。不满意就直接说哪张、哪里不行，助手改完重做，直到你满意：
+
+```text
+$ai-knowledge 四图测试里封面不够亮眼，人物太小；流程图字太多。按这个意见重做这两张，其余不动。
+```
+
+满意以后，这组图可以登记为风格样板，以后出图时当风格参考：
+
+```text
+$ai-knowledge 四图测试我满意，把这组图登记为 blue-cat 的风格样板。
+```
+
+### 第 4 步：确认，正式生效
+
+检查 `character.md` 里写的识别点和颜色没问题后：
+
+```text
+$ai-knowledge 确认 blue-cat，配色也确认。
+```
+
+确认后，如果你还没有默认品牌，它会自动成为默认品牌：以后写文章不用点名，配图自动用它。如果已经有默认品牌，助手会先问你要不要替换。
+
+### 第 5 步：以后慢慢补
+
+```text
+$ai-knowledge 给我的默认品牌加一张场景图：角色抱着笔记本电脑思考，16:9。先放候选给我挑。
+$ai-knowledge 列出我所有的视觉品牌和它们的状态。
+```
+
+## 个人配置放在哪里才生效
+
+所有个人内容都放在这个目录里。安装、更新、卸载 Skill 都不会碰它：
+
+```text
+~/.ai-knowledge/personal/            # Windows：%USERPROFILE%\.ai-knowledge\personal\
+├── writing-rules.md                 # 写作规则：只有"已确认"的条目生效
+├── writing-profile.md               # 规则适用的范围
+├── learning-log.md                  # 学习记录
+├── visual/                          # 默认视觉品牌：确认过的品牌放这里，写文章自动使用
+│   ├── brand-kit.json               #   程序入口：状态、配色、素材清单
+│   ├── character.md                 #   角色识别点、颜色、生图提示词、验收清单
+│   ├── style.md                     #   定位、配色、视觉语言、各类图的做法、风格样板
+│   ├── provenance.md                #   来源、授权、版本记录
+│   ├── assets/
+│   │   ├── canonical/               #   母版：原图、三视图、细节图
+│   │   ├── scenes/                  #   场景图
+│   │   └── samples/                 #   风格样板
+│   └── candidates/                  #   还没选中的候选，不会被使用
+└── brands/<brand-id>/               # 其他品牌，结构和 visual/ 一样；写文章时说"用 <brand-id> 品牌"
+```
+
+**生效规则：**
+
+1. 助手按这个顺序找个人配置目录：你在请求里给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → 上面的默认位置。
+2. 默认位置 `visual/` 里的品牌，只有状态是"已确认"才会自动使用；草稿品牌只在你点名时使用。
+3. `brands/<brand-id>/` 里的品牌不会自动使用，要点名。
+4. 什么都没有时，用公共写作技法和通用图解，功能完整。
+
+上面的流程会帮你建好这些文件，一般不用手动操作。想手动建一个品牌，可以从 [品牌模板](skills/ai-knowledge/assets/templates/brand/) 复制四个文件，填好后用检查工具确认（需要 Python 3.10+）：
+
+```powershell
+python <Skill 安装目录>/scripts/visual_assets.py inspect <品牌目录>   # 读出图片尺寸和校验值，用来填 brand-kit.json
+python <Skill 安装目录>/scripts/visual_assets.py kit <品牌目录>       # 检查整套品牌，ok 为 true 才算建好
+python <Skill 安装目录>/scripts/visual_assets.py list                 # 列出所有品牌和状态
+```
+
+格式可以参考测试用的 [演示配置](tests/fixtures/personal-demo/)。
+
+**多台电脑共用一套配置：** 把个人目录放进一个私有 Git 仓库，在每台电脑上克隆，再设置环境变量指过去，重开终端和助手后生效：
+
+```powershell
+[Environment]::SetEnvironmentVariable('AI_KNOWLEDGE_PERSONAL', 'D:\private\my-personal', 'User')
+```
+
+不要把个人目录放进 Skill 的安装目录或任何公开仓库。
 
 ## 先看成品
 
@@ -37,7 +386,7 @@ $ai-knowledge 什么是单点登录？面向初学者讲清楚。
 
 ![OIDC 示例中的解释图：三个随机值在哪生成、在哪被检查](examples/feature-oidc-demo/assets/oidc-flow.png)
 
-两篇示例都是本仓库实际生成并检查过的产物。核验记录里的条目都标为“未核验”：按设计，写稿者不能给自己的结论盖章，需要新会话、子 Agent 或作者本人独立复查。
+两篇示例都是本仓库实际生成并检查过的产物，配图是不带品牌人物的通用图解。核验记录里的条目都标为"未核验"：按设计，写稿者不能给自己的结论盖章。
 
 ## 它怎样写一篇文章
 
@@ -47,70 +396,25 @@ $ai-knowledge 什么是单点登录？面向初学者讲清楚。
 | 立意 | 一句话写出核心判断，拟三个不同取向的标题和开头 | 选定标题，备选进 review.md |
 | 结构 | 每节回答读者的一个问题，一个例子贯穿全文 | 提纲（不存文件） |
 | 写作 | 用写作技法和已确认的个人风格写正文 | article.md |
-| 配图 | 封面 + 解释图，每张只回答一个问题，手机宽度下可读 | assets/ 与 manifest.json |
+| 配图 | 封面 + 解释图，每张只回答一个问题，手机宽度下可读，整组风格统一 | assets/ 与 manifest.json |
 | 编辑三遍 | 事实遍、读者遍、文字遍，每遍只看一类问题 | 修订后的 article.md |
 | 交付 | 报告路径、未核验条目、可补充经历的位置 | review.md 保持 draft |
 
 三条原则贯穿全程：
 
-- **判断可以有立场，经历必须真实。** 文章可以写“我会先补上这一步”，这类观点在证据表里记为“建议”，由作者认领。作者没讲过的经历不会被写成第一人称故事，而是在 review.md 里留出位置和建议问题。
-- **不确定性写在原地。** 证据不足就把结论写窄，不在段落末尾或文末堆免责声明。
-- **公开安全优先。** 公司、行业身份、内部域名和类名、日志原文、尚未修复的问题都留在 review.md；需要代码时，文章里放重写的原创演示。
+- **判断可以有立场，经历必须真实。** 你没讲过的经历不会被写成第一人称故事，而是在 review.md 里留出位置和建议问题。
+- **不确定性写在原地。** 证据不足就把结论写窄，不在文末堆免责声明。
+- **公开安全优先。** 公司、内部域名和类名、日志原文、尚未修复的问题都留在 review.md；文章里放重写的原创演示。
 
-## 三种模式
+## 能做什么、不能做什么
 
-| 模式 | 输入 | 示例 |
-| --- | --- | --- |
-| Feature 功能复盘 | 当前代码、Commit、Diff、配置 | [OIDC 登录回调](examples/feature-oidc-demo/article.md) |
-| Concept 知识学习 | 一个想讲清的概念 | [单点登录](examples/concept-sso/article.md) |
-| Problem 问题复盘 | 报错、日志、排查记录 | 验收用例见 [tests/cases/problem-cf-pages.md](tests/cases/problem-cf-pages.md) |
-
-## 常用说法
-
-```text
-$ai-knowledge 帮我把当前项目的 OIDC 登录功能写成一篇文章，面向 Java 初学者。
-$ai-knowledge 什么是单点登录？允许查可靠资料，standard 深度。
-$ai-knowledge 帮我复盘这次构建失败，只根据我提供的记录。
-$ai-knowledge 什么是 SSO？不要图。
-$ai-knowledge 把 docs/knowledge/sso/article.md 改编成小红书版本。
-$ai-knowledge 请独立复查 docs/knowledge/sso/review.md 的事实核验。
-```
-
-更多示例见 [使用说明](docs/usage-examples.md)。平台改编按需另写文件（如 `xiaohongshu.md`），主稿不动；平台规则见 [发布合同](skills/ai-knowledge/references/publishing.md)。
-
-## 个人风格与视觉品牌
-
-Skill 本身不附带任何人的个人配置。你的写作规则和视觉品牌放在自己电脑上的个人配置目录里，不进 Skill、不进任何仓库：
-
-```text
-~/.ai-knowledge/personal/          # Windows：%USERPROFILE%\.ai-knowledge\personal\
-├── writing-rules.md               # 个人写作规则（只有"已确认"的条目生效）
-├── writing-profile.md             # 适用范围
-├── learning-log.md                # 学习记录
-├── visual/                        # 可选：默认视觉品牌
-└── brands/<brand-id>/             # 可选：其他品牌，写文章时说"用 <brand-id> 品牌"
-```
-
-每个视觉品牌都是同一套精简结构：`brand-kit.json`（状态、配色、素材清单）、`character.md`（角色识别点、场景规则、生图提示词、验收清单）、`style.md`（定位、配色、各类图的做法）、`provenance.md`（来源与授权），再加一个 `assets/` 图片目录。
-
-**用一张图建立品牌。** 发一张人物或角色图，并明确说"用这张图建立视觉品牌"，Skill 会问三个问题（名字、图片来源、用途），在 `brands/<brand-id>/` 生成一套草稿；如果生图工具能接收参考图，还可以生成三视图和场景候选让你挑。草稿不会被自动使用，你说"确认 `<brand-id>`"之后才生效。只发图不说要做什么，不会启动这个流程。步骤见 [建立视觉品牌](skills/ai-knowledge/references/visual-brand-setup.md)。
-
-**一套图好看、统一、认得出。** [美术方向](skills/ai-knowledge/references/visual-art-direction.md) 把审美写成九条可执行的公式：一个材质比喻、一支笔、一个只当工具用的主色、从角色识别点提取的签名图形、固定版式标记、角色当讲解员、字少字大、生图有规矩、整组验收。每个品牌在 style.md 的"视觉语言"里写下自己的答案；建立品牌或改视觉语言时做一次四图测试（封面、流程图、数据图、插画），满意的那组登记为风格样板。一次出整套图时，用 [出图说明模板](skills/ai-knowledge/assets/templates/art-brief.md) 交给能接收参考图的生图工具。
-
-也可以用环境变量 `AI_KNOWLEDGE_PERSONAL` 指向别的目录（比如你的私有仓库），或在请求里直接给出路径。找不到个人配置时，Skill 自动用公共写作技法和通用图解，功能完整。规则模板在 [assets/templates](skills/ai-knowledge/assets/templates/)，格式示例见测试用的 [演示配置](tests/fixtures/personal-demo/)。
-
-风格可以学习：比较 AI 初稿和你满意的终稿，总结修改习惯；单篇观察先记为候选，经你确认才写回个人配置目录，不需要重装 Skill。见 [复盘演示](examples/style-reflection/report.md)。
-
-## 安装
-
-基础 Skill 没有运行依赖。可选的检查脚本需要 Python 3.10+ 标准库。
-
-```powershell
-npx skills add . --list
-npx skills add . -g -a codex -s ai-knowledge
-```
-
-GitHub 发布后用 `npx skills add <owner>/ai-knowledge -g -a codex -s ai-knowledge`（替换 `<owner>`）。手动安装、刷新已有副本和兼容性说明见 [安装文档](docs/installation.md)。
+- 文章质量取决于你用的助手、模型和工具。Skill 是一套写作和审核的方法，不是独立程序。
+- 联网查证、读 PDF、看图、生图都依赖宿主的能力。不能联网时，review.md 会写明"未联网核实"；没有生图工具时，助手会用程序画解释图，人物图记为待制作。
+- 不能直接看视频，需要先导出字幕或文字稿。
+- 生成图里的中文和数据比例会逐项核对，但最终好不好看只有你能判断。
+- 不会自动发布、提交或推送；不改业务代码。
+- 自动检查只能证明文件结构和图片台账一致，不能证明事实正确或内容可以公开。所以发表前请做一次独立复查（玩法 5）。
+- 目前只在 Codex 里完整跑过；Claude Code、Cursor、OpenCode 可以安装，但没有完整实测。
 
 ## 项目结构
 
@@ -125,12 +429,14 @@ skills/ai-knowledge/          # 唯一的 Skill 源码，安装时复制整个�
 │   ├── visual-planning.md / visual-art-direction.md
 │   ├── visual-brand-loading.md / visual-brand-setup.md
 │   └── personal-experience.md / style-*.md
-├── assets/templates/         # article.md、review.md 及风格档案模板
+├── assets/templates/         # article.md、review.md、出图说明、风格档案和品牌模板
 └── scripts/                  # 只读辅助：visual_assets.py、style_learning.py、analyze_style.py
 examples/                     # concept-sso、feature-oidc-demo 两篇示范，及风格档案/复盘演示
 tests/                        # 校验器、单元测试、验收用例与测试报告
 docs/                         # 安装、使用、架构与各版本历史验收记录
 ```
+
+更多用法见 [使用示例](docs/usage-examples.md)，设计取舍见 [架构说明](docs/architecture.md)，版本变化见 [更新记录](CHANGELOG.md)。
 
 ## 开发与测试
 
@@ -139,14 +445,7 @@ python -m unittest discover -s tests -v
 python tests/validate.py
 ```
 
-开发需要 Python 3.10+ 和 `tests/requirements.txt` 中的 PyYAML。实际执行的检查及范围见 [测试报告](tests/RESULTS.md)，重跑方法见 [测试说明](tests/README.md)，设计取舍见 [架构说明](docs/architecture.md)。
-
-## 当前限制
-
-- 写作质量依赖宿主 Agent、模型和可用工具；Skill 是指令包，不是独立程序。
-- 校验器只检查结构、图片台账和有限的敏感模式，不能证明事实正确、内容可公开或文章好读。
-- 真实业务项目的 Feature 文章、Claude Code / Cursor / OpenCode 中的完整执行尚未验收。
-- 不提供自动发布、视频脚本、配音、Web UI 或数据库。
+开发需要 Python 3.10+ 和 `tests/requirements.txt` 中的 PyYAML。实际执行的检查及范围见 [测试报告](tests/RESULTS.md)，重跑方法见 [测试说明](tests/README.md)。
 
 ## 许可
 

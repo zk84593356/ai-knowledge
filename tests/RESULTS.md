@@ -1,5 +1,18 @@
 # 实际验收记录
 
+## README 使用指南 — 2026-10-17
+
+只改 README.md 和本记录、更新记录，Skill 文件没有变化。
+
+| 命令/检查 | 本轮结果 |
+| --- | --- |
+| python -m unittest discover -s tests | 160 项：159 通过、1 跳过（同前） |
+| python tests/validate.py | 第一次 FAIL 1 项：README 里 Windows 用户目录的写法示例命中个人路径检查，改为 `%USERPROFILE%` 后 PASS |
+| python tests/validate.py --bundle（两篇示范） | 均 PASS |
+| README 内部链接与图片路径 | 逐个确认文件存在；目录锚点按 GitHub 标题规则人工核对，未在网页上点击验证 |
+
+没有验证的：提示词只对照了 Skill 规则，没有逐条在宿主里实际运行；外部链接未检查。
+
 ## v0.6.0 美术方向进入公共 Skill — 2026-10-16
 
 新增美术方向说明和出图说明模板，品牌 style.md 模板增加视觉语言与风格样板，建立品牌流程增加四图测试，检查工具新增 `sample` 图片角色。
