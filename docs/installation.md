@@ -66,13 +66,30 @@ Claude Code、Cursor、OpenCode 可用同一安装源，并按 CLI 支持的 `-a
 
 个人写作规则和视觉品牌不在 Skill 里，安装和更新 Skill 都不会碰它们。Skill 按顺序查找：请求里明确给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → `%USERPROFILE%\.ai-knowledge\personal\`。都没有时用公共写作技法和通用图解。默认视觉品牌在其中的 `visual\`，其他品牌在 `brands\<brand-id>\`。
 
+## 内容工作台（v0.7.0 起，可选）
+
+工作台是放用户人设、风格参考、写作技巧和各平台稿件的目录，同样不在 Skill 里。查找顺序：请求里给出的路径 → 环境变量 `AI_KNOWLEDGE_WORKSPACE` → 个人配置目录 `settings.json` 的 `workspace` 字段。都没有时，文章照旧写到当前项目的 `docs/knowledge/<slug>/`。建一个空工作台：
+
+```powershell
+python skills/ai-knowledge/scripts/create_project.py init --workspace D:\内容工作台
+```
+
+目录结构见 [发布合同](../skills/ai-knowledge/references/发布合同.md) 的"内容工作台"一节。
+
+## 从 v0.6.0 升级到 v0.7.0
+
+- 内容类型由功能/知识/踩坑三种改为讲解 `explainer`、复盘 `retrospective`、测评 `evaluation`、观点 `opinion` 四种。旧文章 frontmatter 里的 `concept`、`feature`、`problem` 不会自动转换；用 `validate.py --bundle` 检查旧稿会报模式无效，需要时手动改成新值（concept → explainer，feature/problem → retrospective）。
+- Skill 内的参考文档改为中文文件名，模板从 `assets/templates/` 移到 `templates/`，文件名加 `-template`。自己写过指向旧路径的链接或脚本要跟着改。
+- 个人配置目录和视觉品牌格式不变，不用转换。
+- 不建工作台也能照旧使用；要用工作台见上一节。
+
 ## 从 v0.5.0 升级到 v0.6.0
 
 格式兼容，已有品牌不用转换，`kit` 检查照常通过。新版 style.md 模板多了"视觉语言"和"风格样板"两节；旧品牌没有这两节时，配图按美术方向的通用公式做。想补上时，可以让助手按模板起草视觉语言提案，再做一次四图测试。品牌图片新增 `sample` 角色（`assets/samples/`），用于登记风格样板。
 
 ## 从 v0.4.0 升级到 v0.5.0
 
-v0.5.0 的视觉品牌只认精简格式（`brand-kit.json` 的 `schemaVersion` 为 `"2"`，外加 character.md、style.md、provenance.md）。旧格式的品牌会被当作无效，回退通用图解，不会报错中断写作。转换方法：先把旧品牌目录整体备份，再按 `skills/ai-knowledge/assets/templates/brand/` 的四个模板合并原来的规范文件，图片原样保留，最后运行 `python skills/ai-knowledge/scripts/visual_assets.py kit <品牌目录>` 确认通过。也可以直接让助手按 [建立视觉品牌](../skills/ai-knowledge/references/visual-brand-setup.md) 的格式转换。
+v0.5.0 的视觉品牌只认精简格式（`brand-kit.json` 的 `schemaVersion` 为 `"2"`，外加 character.md、style.md、provenance.md）。旧格式的品牌会被当作无效，回退通用图解，不会报错中断写作。转换方法：先把旧品牌目录整体备份，再按 `skills/ai-knowledge/templates/brand/` 的四个模板合并原来的规范文件，图片原样保留，最后运行 `python skills/ai-knowledge/scripts/visual_assets.py kit <品牌目录>` 确认通过。也可以直接让助手按 [建立视觉品牌](../skills/ai-knowledge/references/视觉-建立品牌.md) 的格式转换。
 
 要在多台电脑上使用同一份配置，可以把个人目录放进私有 Git 仓库，在每台电脑上克隆后设置用户级环境变量，重开终端和 Agent 生效：
 

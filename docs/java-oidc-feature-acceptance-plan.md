@@ -1,4 +1,4 @@
-# 真实 Java OIDC 项目｜Feature 模式验收方案
+# 真实 Java OIDC 项目｜功能复盘验收方案
 
 日期：2026-10-15，2026-10-16 按 v0.4.0 文件合同（article.md + review.md + assets/）更新。状态：可执行方案，尚未获得真实业务项目路径或源码，未开展业务代码分析、构建或登录测试。公开仓库只保存本通用方案；真实源码、私有证据、测试日志与全部生成产物默认保留在该业务项目中。现有 Python oidc-demo 仅是原创演示，不能代替真实 Java 项目验收。
 
@@ -38,7 +38,7 @@
 | assets/ 与 manifest.json | 封面 + 2–4 张解释图的 PNG 与可编辑 SVG；来源、状态、实际尺寸/散列；未生成的图不插链接 |
 | 验收记录 | 实际命令、版本、通过/失败/跳过、未验证事项、脱敏复核、用户批准依据；留在业务项目内，不写进 article.md |
 
-两份文件共享 topic、mode（feature）、language 和真实日期，type 分别为 article 与 review，字段见 Skill 的 publishing.md。缺证据可交付明确受限的文章（结论写窄），但不能宣称完整通过真实 OIDC 验收。用户没有提供开发经历时，在 review.md 留出位置和问题，不虚构开发过程。
+两份文件共享 topic、mode（retrospective）、language 和真实日期，type 分别为 article 与 review，字段见 Skill 的 发布合同.md。缺证据可交付明确受限的文章（结论写窄），但不能宣称完整通过真实 OIDC 验收。用户没有提供开发经历时，在 review.md 留出位置和问题，不虚构开发过程。
 
 ## 4. 配图规划
 

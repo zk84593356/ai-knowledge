@@ -1,5 +1,27 @@
 # 实际验收记录
 
+## v0.7.0 内容创作流程 — 2026-10-17
+
+四种内容类型、11 步流程、内容工作台、参考文档中文文件名、13 份新参考文档、5 个新模板、两个工作台脚本。
+
+| 命令/检查 | 本轮结果 |
+| --- | --- |
+| python -m unittest discover -s tests | 169 项：168 通过、1 跳过（符号链接权限，同前）；新增 test_workspace.py |
+| python tests/validate.py | PASS，0 项发现；检查清单改为中文文件名和 templates/ 新路径 |
+| python tests/validate.py --bundle（两篇示范，模式已改为 explainer / retrospective） | 均 PASS |
+| python skills/ai-knowledge/scripts/visual_assets.py bundle（两篇示范） | ok，0 错误 |
+| 旧模式值 | 把示范副本的 mode 改回 `concept`，`--bundle` 报 2 项 invalid mode，与安装说明一致 |
+| create_project.py / save_article.py | 单元测试外，另在临时目录手动跑过 init、new（含同名 `-02`）、save 与 dry-run |
+| node tests/check-mermaid.mjs | 跳过：PATH 上的 Node 是 v12，报 ERR_REQUIRE_ESM。architecture.md 的流程图改过，没有实际渲染 |
+| 全仓库文本扫描 | 旧参考文件名只出现在更新记录、本记录和安装说明的升级说明里 |
+
+没有验证的：
+
+- 新用例 tests/cases/workflow-gates.md、evaluation-opinion.md 没有让 Agent 实际跑过；讲解、复盘的旧用例也没有按新流程重跑。11 步流程、协作强度停点、四遍打磨目前只经过文字审读。
+- 参考文档里的平台规则、法规条款和研究数字按文中来源整理，访问日期 2026-10-17；标为"未核实"或"经验值"的条目没有找到一手出处。平台规则会变，发布前仍要以平台当时的公告为准。
+- 测评夹具 tests/fixtures/evaluation-demo/ 是模拟数据，只能检查流程是否按记录写结论，不能说明任何工具好坏。
+- 两篇示范只改了模式值和个别链接，正文没有按四遍打磨重写。
+
 ## README 使用指南 — 2026-10-17
 
 只改 README.md、docs/usage-examples.md（精简为补充页）和本记录、更新记录，Skill 文件没有变化。

@@ -22,7 +22,7 @@ PACKAGE = ROOT / "skills/ai-knowledge"
 PERSONAL = ROOT / "tests/fixtures/personal-demo"
 KIT = PERSONAL / "visual"
 DRAFT = PERSONAL / "brands/demo-draft"
-TEMPLATES = PACKAGE / "assets/templates/brand"
+TEMPLATES = PACKAGE / "templates/brand"
 spec = importlib.util.spec_from_file_location("visual_brand", PACKAGE / "scripts/visual_assets.py")
 visual = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(visual)

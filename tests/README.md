@@ -2,7 +2,7 @@
 
 本项目的 Skill 由 Agent 执行，测试分为生成走查、程序检查、内容审读和真实宿主验收四层。脚本不会自动调用模型，也不会根据标题匹配就给教学质量打高分。
 
-每个主题的产物是一篇可发表的 `article.md`、一份只给作者看的 `review.md`，以及按需的 `assets/`（PNG 图片、`manifest.json` 和可编辑 SVG 源）。合同见 [发布合同](../skills/ai-knowledge/references/publishing.md)。
+每个主题的产物是一篇可发表的 `article.md`、一份只给作者看的 `review.md`，以及按需的 `assets/`（PNG 图片、`manifest.json` 和可编辑 SVG 源）。合同见 [发布合同](../skills/ai-knowledge/references/发布合同.md)。
 
 ## 可重复运行的自动检查
 
@@ -64,7 +64,7 @@ Windows 脚本使用已安装的 Edge；其他系统使用 Playwright Chromium�
 
 [边界用例](cases/boundaries.md) 覆盖离线、证据缺失、提示注入、非技术英文、自定义路径、重复生成、不要图和核验状态。内容走查与宿主实际执行必须分别记录；只有真的写入两次并比较旧文件，才能称为冲突保护行为测试。
 
-内容审读按 [编辑与核验](../skills/ai-knowledge/references/editing.md) 的三遍编辑与阻断项进行。结论必须附依据，事实与证据真实性为硬门槛。`review.md` 里的"已核验"只能来自独立复查（新会话、子 Agent 或用户），不能由同一生成 Agent 的自评代替；真人学习效果需要用户另行阅读与回答问题。
+内容审读按 [打磨与核验](../skills/ai-knowledge/references/打磨与核验.md) 的四遍打磨与阻断项进行。结论必须附依据，事实与证据真实性为硬门槛。`review.md` 里的"已核验"只能来自独立复查（新会话、子 Agent 或用户），不能由同一生成 Agent 的自评代替；真人学习效果需要用户另行阅读与回答问题。
 
 实际结果见 [RESULTS.md](RESULTS.md)。
 

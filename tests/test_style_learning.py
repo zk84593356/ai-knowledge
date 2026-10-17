@@ -169,7 +169,7 @@ class StyleLearningTests(unittest.TestCase):
         self.assertEqual(result["rules"], [])
 
     def test_missing_public_resource_is_error(self):
-        (self.package / "references/writing-craft.md").unlink()
+        (self.package / "references/内容写作技巧.md").unlink()
         with self.assertRaises(OSError):
             learning.select_context(self.package)
 

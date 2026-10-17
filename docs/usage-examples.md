@@ -30,13 +30,13 @@ $ai-knowledge 分析我指定目录里的三篇 Markdown，提炼句子、用词
 
 | 内容 | 位置 |
 | --- | --- |
-| Concept 示范文章 | [concept-sso](../examples/concept-sso/article.md)，[核验记录](../examples/concept-sso/review.md) |
-| Feature 示范文章（分析本仓库的原创演示工程） | [feature-oidc-demo](../examples/feature-oidc-demo/article.md)，[核验记录](../examples/feature-oidc-demo/review.md) |
-| Problem 验收用例 | [problem-cf-pages](../tests/cases/problem-cf-pages.md) |
+| 讲解示范文章 | [concept-sso](../examples/concept-sso/article.md)，[核验记录](../examples/concept-sso/review.md) |
+| 功能复盘示范文章（分析本仓库的原创演示工程） | [feature-oidc-demo](../examples/feature-oidc-demo/article.md)，[核验记录](../examples/feature-oidc-demo/review.md) |
+| 故障复盘验收用例 | [problem-cf-pages](../tests/cases/problem-cf-pages.md) |
 | 风格档案演示 | [style-profile](../examples/style-profile/writing-profile.md) |
 | 修改复盘演示 | [style-reflection](../examples/style-reflection/report.md) |
 | 个人配置格式 | [演示配置](../tests/fixtures/personal-demo/) |
-| 平台改编要点 | [发布合同](../skills/ai-knowledge/references/publishing.md#平台改编) |
+| 平台改编要点 | [发布合同](../skills/ai-knowledge/references/发布合同.md#平台改编) |
 
 ## 可选的检查命令
 

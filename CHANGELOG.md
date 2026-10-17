@@ -1,5 +1,19 @@
 # 更新记录
 
+## 0.7.0 — 2026-10-17
+
+从"写一篇技术文章"扩展为一套内容创作流程，按 docs/content-workflow.md（v0.2）实现。
+
+- 内容类型：讲解 `explainer`、复盘 `retrospective`、测评 `evaluation`、观点 `opinion` 四种，取代 concept/feature/problem。新增证据类型"公开资料""实测记录"。旧稿的模式值不自动转换，升级方法见安装说明。
+- 流程：SKILL.md 改为 11 步（接需求 → 调研 → 选角度 → 备素材 → 搭结构 → 写初稿 → 打磨四遍 → 配图 → 平台改编 → 发布归档 → 复盘学习），三种协作强度（快速、标准、深度），各有固定停点。
+- 内容工作台：可选的外部目录（用户人设、风格参考、写作技巧、规范指南、我的项目下按平台分稿件、历史存档），查找顺序为请求路径 → `AI_KNOWLEDGE_WORKSPACE` → 个人配置 `settings.json` 的 `workspace`；没有时仍写到 `docs/knowledge/<slug>/`。新增 scripts/create_project.py（init/new，不覆盖已有文件，同名加 `-02`）和 scripts/save_article.py（把已发布项目移到历史存档，支持 dry-run）。
+- 目录：references 全部改为中文文件名（如 publishing.md → 发布合同.md、editing.md → 打磨与核验.md、writing-craft.md → 内容写作技巧.md）；assets/templates/ 移到 templates/，文件名加 `-template`。新增 skills/ai-knowledge/README.md，说明每个文件对应流程的哪一步。
+- 新参考文档 13 份：调研-测评、调研-观点、调研-资料卡、用户人设-快速参考、选题与角度、写作技巧-金字塔原理、偏航句用法、降AI味指南、自媒体防限流指南、平台改编、口播引导话术、自媒体动画、运营沉淀。平台规则、法规和研究数字都注明来源与访问日期，查不到出处的标为经验值或未核实。
+- 旧参考文档：发布合同加入工作台布局、四种模式和发布状态字段；打磨与核验由三遍改为四遍（事实、读者、文字含降 AI 味与防限流、独立复查），新增"未披露利益关系"阻断项；内容写作技巧加入手机阅读排版和各类型主线；协作文档与真实经历重写。
+- 模板：重写 article 与 review 模板；新增 brief、协作文档、口播稿、资料卡、用户人设模板。
+- 测试：validate.py 适配新文件名、四种模式和新证据类型；新增 tests/test_workspace.py；新增用例 tests/cases/workflow-gates.md、evaluation-opinion.md 和模拟夹具 tests/fixtures/evaluation-demo/；边界用例补充工作台路径、没有人设、降重与过检测、限流传言和推广测评的利益披露。两篇示范的模式改为 explainer / retrospective，目录名不变。
+- 文档：README、架构说明、安装说明（v0.6.0 → v0.7.0）、AGENTS.md、content-workflow.md 同步。
+
 ## 文档更新 — 2026-10-17
 
 只改 README，Skill 本身仍是 0.6.0。

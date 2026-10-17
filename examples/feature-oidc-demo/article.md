@@ -2,7 +2,7 @@
 title: "OIDC 登录能跑通，为什么还要多传三个随机值？"
 topic: "oidc-login-callback"
 type: "article"
-mode: "feature"
+mode: "retrospective"
 summary: "state、nonce、PKCE 各绑定一样东西；少了哪个登录都能成功，所以最容易被省掉。"
 tags: ["OIDC", "OAuth 2.0", "PKCE", "登录安全"]
 created: "2026-10-16"

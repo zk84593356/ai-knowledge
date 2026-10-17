@@ -87,7 +87,7 @@ def personal_root():
 
 def select_context(skill_root, public_only=False, profile=None):
     root = Path(skill_root).resolve()
-    public = contained_file(root, "references/writing-craft.md")
+    public = contained_file(root, "references/内容写作技巧.md")
     read_text(public)  # Missing public rules are an error, not a silent fallback.
     result = {"public": str(public), "route": "public-only", "source": None, "source_path": None,
               "profile": None, "rules": [], "reason": "personal style disabled",

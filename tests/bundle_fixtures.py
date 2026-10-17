@@ -5,7 +5,7 @@ from pathlib import Path
 import struct
 import zlib
 
-ARTICLE_META = dict(title="会话为什么能跨应用", topic="topic", type="article", mode="concept",
+ARTICLE_META = dict(title="会话为什么能跨应用", topic="topic", type="article", mode="explainer",
                     summary="用两次跳转讲清登录态从哪里来", tags=["登录", "会话"],
                     created="2026-10-14", updated="2026-10-14", language="zh-CN")
 ARTICLE_BODY = """![封面：两个应用共用一次登录](./assets/cover.png)
@@ -26,7 +26,7 @@ ARTICLE_BODY = """![封面：两个应用共用一次登录](./assets/cover.png)
 
 - 示例规范：https://example.com/spec
 """
-REVIEW_META = dict(title="会话为什么能跨应用｜发布前核验", topic="topic", type="review", mode="concept",
+REVIEW_META = dict(title="会话为什么能跨应用｜发布前核验", topic="topic", type="review", mode="explainer",
                    status="draft", created="2026-10-14", updated="2026-10-14", language="zh-CN")
 REVIEW_BODY = """# 会话为什么能跨应用｜发布前核验
 

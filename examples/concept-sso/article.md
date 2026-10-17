@@ -2,7 +2,7 @@
 title: "登录一次，为什么另一个网站也认得你？"
 topic: "sso"
 type: "article"
-mode: "concept"
+mode: "explainer"
 summary: "单点登录没有让网站共用 Cookie，而是让每个网站都去问同一个身份服务。"
 tags: ["单点登录", "SSO", "OIDC", "身份认证"]
 created: "2026-10-16"

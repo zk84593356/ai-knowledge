@@ -2,7 +2,7 @@
 title: "OIDC 登录能跑通，为什么还要多传三个随机值？｜发布前核验"
 topic: "oidc-login-callback"
 type: "review"
-mode: "feature"
+mode: "retrospective"
 status: "draft"
 created: "2026-10-16"
 updated: "2026-10-16"
@@ -11,12 +11,12 @@ language: "zh-CN"
 
 # OIDC 登录能跑通，为什么还要多传三个随机值？｜发布前核验
 
-本文件只给作者看，不发表。这是 ai-knowledge v0.4.0 的 Feature 模式示范产物，分析对象是仓库内为教学原创的演示工程 `tests/fixtures/oidc-demo/`，不是任何真实系统。
+本文件只给作者看，不发表。这是 ai-knowledge v0.4.0 的功能复盘示范产物（v0.7.0 起模式记为 retrospective），分析对象是仓库内为教学原创的演示工程 `tests/fixtures/oidc-demo/`，不是任何真实系统。
 
 ## 发布状态
 
 - 状态：draft。
-- 发布前还要做：请新会话或子 Agent 按 editing.md 独立复查下表，尤其是 F12 引用的 RFC 9700 原文；确认配图审美；文末演示代码的位置如需改成可点击链接，换成仓库的公开地址。
+- 发布前还要做：请新会话或子 Agent 按 打磨与核验.md 独立复查下表，尤其是 F12 引用的 RFC 9700 原文；确认配图审美；文末演示代码的位置如需改成可点击链接，换成仓库的公开地址。
 - 用户确认记录：尚未确认。
 
 ## 事实核验

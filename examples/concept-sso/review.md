@@ -2,7 +2,7 @@
 title: "登录一次，为什么另一个网站也认得你？｜发布前核验"
 topic: "sso"
 type: "review"
-mode: "concept"
+mode: "explainer"
 status: "draft"
 created: "2026-10-16"
 updated: "2026-10-16"
@@ -16,7 +16,7 @@ language: "zh-CN"
 ## 发布状态
 
 - 状态：draft。
-- 发布前还要做：请新会话或子 Agent 按 editing.md 独立复查下表；确认配图审美；按目标平台核对标题长度和封面裁切。
+- 发布前还要做：请新会话或子 Agent 按 打磨与核验.md 独立复查下表；确认配图审美；按目标平台核对标题长度和封面裁切。
 - 用户确认记录：尚未确认。
 
 ## 事实核验

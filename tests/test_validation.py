@@ -207,7 +207,7 @@ class BundleTests(unittest.TestCase):
         self.assertFinding("review.md: title must be the article title followed by ｜发布前核验")
 
     def test_metadata_mismatch(self):
-        for key, old, new in (("mode", 'mode: "concept"', 'mode: "feature"'),
+        for key, old, new in (("mode", 'mode: "explainer"', 'mode: "retrospective"'),
                               ("language", 'language: "zh-CN"', 'language: "en"'),
                               ("created", 'created: "2026-10-14"', 'created: "2026-10-13"'),
                               ("topic", 'topic: "topic"', 'topic: "another"')):
@@ -238,7 +238,7 @@ class BundleTests(unittest.TestCase):
                 self.mutate(f'topic: "{slug}"', 'topic: "topic"')
 
     def test_invalid_mode(self):
-        self.mutate('mode: "concept"', 'mode: "tutorial"')
+        self.mutate('mode: "explainer"', 'mode: "tutorial"')
         self.assertFinding("article.md: invalid mode")
 
     def test_svg_embedded_in_article(self):
@@ -341,13 +341,13 @@ class SkillPackageTests(unittest.TestCase):
     def test_missing_contract_resources_reported(self):
         target = self.root / "ai-knowledge"
         shutil.copytree(ROOT / "skills/ai-knowledge", target, ignore=shutil.ignore_patterns("__pycache__"))
-        for relative in ("references/publishing.md", "assets/templates/article.md",
-                         "assets/templates/review.md", "scripts/visual_assets.py"):
+        for relative in ("references/发布合同.md", "templates/article-template.md",
+                         "templates/review-template.md", "scripts/visual_assets.py"):
             path = target / relative
             if path.exists():
                 path.unlink()
         errors = validate_skill(target)
-        for message in ("missing reference: publishing", "missing template: article",
+        for message in ("missing reference: 发布合同", "missing template: article",
                         "missing template: review", "missing script: scripts/visual_assets.py"):
             self.assertIn(message, errors)
 

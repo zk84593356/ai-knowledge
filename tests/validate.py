@@ -21,23 +21,25 @@ REVIEW_KEYS = ("title", "topic", "type", "mode", "status", "created", "updated",
 REVIEW_SUFFIX = "｜发布前核验"
 REVIEW_SECTIONS = ("发布状态", "事实核验", "公开安全过滤", "可补充的个人经历", "配图", "标题与摘要备选")
 EVIDENCE_HEADER = ["ID", "结论", "类型", "依据", "核验"]
-EVIDENCE_TYPES = {"项目事实", "框架行为", "协议原理", "通用知识", "推测", "建议"}
+EVIDENCE_TYPES = {"项目事实", "框架行为", "协议原理", "通用知识", "公开资料", "实测记录", "推测", "建议"}
 EVIDENCE_CHECKS = {"未核验", "已核验", "推翻", "存疑", "不适用"}
 # "draft" is matched as a standalone word so identifiers such as draft-ietf-* stay allowed.
 STATUS_WORDING = re.compile(r"未核验|已核验|发布前核验|核验日期|草稿|待审批|未批准|工作区"
                             r"|(?<![\w-])draft(?![\w-])", re.I)
 SUMMARY_LIMIT = 60
-MODES = {"feature", "concept", "problem"}
+MODES = {"explainer", "retrospective", "evaluation", "opinion"}
 REFERENCES = (
-    "publishing", "writing-craft", "editing", "feature-analysis", "concept-explanation",
-    "problem-review", "visual-planning", "visual-art-direction", "visual-brand-loading", "visual-brand-setup",
-    "personal-experience",
-    "style-loading", "style-application", "style-analysis", "style-reflection", "style-source-update",
+    "发布合同", "用户人设-快速参考", "调研-讲解", "调研-复盘功能", "调研-复盘故障", "调研-测评", "调研-观点",
+    "调研-资料卡", "选题与角度", "协作文档与真实经历", "写作技巧-金字塔原理", "内容写作技巧", "偏航句用法",
+    "打磨与核验", "降AI味指南", "自媒体防限流指南", "平台改编", "口播引导话术", "自媒体动画", "运营沉淀",
+    "视觉-配图验收", "视觉-美术方向", "视觉-品牌加载", "视觉-建立品牌",
+    "风格-加载", "风格-应用", "风格-分析", "风格-改稿复盘", "风格-写回",
 )
-TEMPLATES = ("article", "review", "personal-experience", "style-reflection",
+TEMPLATES = ("brief", "协作文档", "资料卡", "用户人设", "article", "review", "口播稿", "经历条目", "改稿复盘",
              "writing-profile", "writing-rules", "art-brief")
 BRAND_TEMPLATES = ("brand-kit.json", "character.md", "style.md", "provenance.md")
-SCRIPTS = ("scripts/analyze_style.py", "scripts/style_learning.py", "scripts/visual_assets.py")
+SCRIPTS = ("scripts/analyze_style.py", "scripts/style_learning.py", "scripts/visual_assets.py",
+           "scripts/create_project.py", "scripts/save_article.py")
 EXAMPLE_BUNDLES = ("concept-sso", "feature-oidc-demo")
 DEMO_KIT = "tests/fixtures/personal-demo/visual"
 DEMO_DRAFT_KIT = "tests/fixtures/personal-demo/brands/demo-draft"
@@ -202,10 +204,10 @@ def validate_skill(folder):
         if not (folder / "references" / f"{name}.md").is_file():
             errors.append(f"missing reference: {name}")
     for name in TEMPLATES:
-        if not (folder / "assets/templates" / f"{name}.md").is_file():
+        if not (folder / "templates" / f"{name}-template.md").is_file():
             errors.append(f"missing template: {name}")
     for name in BRAND_TEMPLATES:
-        if not (folder / "assets/templates/brand" / name).is_file():
+        if not (folder / "templates/brand" / name).is_file():
             errors.append(f"missing brand template: {name}")
     for relative in SCRIPTS:
         if not (folder / relative).is_file():
