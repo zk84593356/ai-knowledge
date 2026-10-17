@@ -1,6 +1,6 @@
 """Functional tests for routing/diff/merge; semantic decisions require Agent review.
 
-Personal config comes from a temporary copy of tests/fixtures/personal-demo; the real
+Workspace style comes from a temporary copy of tests/fixtures/workspace-demo; the real
 home directory is replaced by an empty temporary one in every test.
 """
 import contextlib
@@ -19,7 +19,9 @@ from unittest.mock import patch
 from validate import ROOT, validate_skill
 
 PACKAGE = ROOT / "skills/ai-knowledge"
-FIXTURE = ROOT / "tests/fixtures/personal-demo"
+FIXTURE = ROOT / "tests/fixtures/workspace-demo"
+RULES = "风格参考/我的写作规则.md"
+PROFILE = "风格参考/我的写作档案.md"
 spec = importlib.util.spec_from_file_location("learning", PACKAGE / "scripts/style_learning.py")
 learning = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(learning)
@@ -57,33 +59,43 @@ class StyleLearningTests(unittest.TestCase):
         os.environ.pop(ENV, None)
 
     def home_personal(self):
-        target = self.home / ".ai-knowledge/personal"
+        target = self.root / "settings-workspace"
         shutil.copytree(FIXTURE, target)
+        (self.home / ".ai-knowledge").mkdir(exist_ok=True)
+        (self.home / ".ai-knowledge/settings.json").write_text(
+            json.dumps({"workspace": str(target)}), encoding="utf-8")
         return target
 
     def test_env_combines_public_and_confirmed_rules_only(self):
         result = learning.select_context(self.package)
-        self.assertEqual((result["route"], result["source"]), ("personal", "env"))
+        self.assertEqual((result["route"], result["source"]), ("workspace", "env"))
         self.assertEqual(Path(result["source_path"]), self.personal.resolve())
         self.assertEqual([r["id"] for r in result["rules"]], ["SAMPLE-001"])
-        self.assertTrue(Path(result["public"]).is_file())
-        self.assertEqual(Path(result["profile"]), self.personal.resolve() / "writing-profile.md")
+        self.assertEqual(Path(result["public"]),
+                         (self.package / "templates/内容工作台/写作技巧/内容写作技巧.md").resolve())
+        self.assertEqual(Path(result["profile"]), self.personal.resolve() / PROFILE)
+
+    def test_workspace_craft_overrides_bundled_copy(self):
+        craft = self.personal / "写作技巧/内容写作技巧.md"
+        craft.parent.mkdir()
+        craft.write_text("# 我自己的写作技巧\n", encoding="utf-8")
+        self.assertEqual(Path(learning.select_context(self.package)["public"]), craft.resolve())
 
     def test_package_has_no_bundled_personal_config(self):
         self.assertFalse((PACKAGE / "styles").exists())
         self.assertEqual(validate_skill(self.package), [])
 
-    def test_home_default_used_when_env_unset(self):
+    def test_settings_workspace_used_when_env_unset(self):
         self.unset_env()
         self.assertEqual(learning.select_context(self.package)["route"], "public-only")
         target = self.home_personal()
         result = learning.select_context(self.package)
-        self.assertEqual((result["route"], result["source"]), ("personal", "home"))
+        self.assertEqual((result["route"], result["source"]), ("workspace", "settings"))
         self.assertEqual(Path(result["source_path"]), target.resolve())
 
-    def test_precedence_explicit_then_env_then_home(self):
+    def test_precedence_explicit_then_env_then_settings(self):
         self.home_personal()
-        rules = self.personal / "writing-rules.md"
+        rules = self.personal / RULES
         rules.write_text(rules.read_text("utf-8").replace("## SAMPLE-001", "## ENVONLY-001"), encoding="utf-8")
         result = learning.select_context(self.package)
         self.assertEqual((result["source"], [r["id"] for r in result["rules"]]), ("env", ["ENVONLY-001"]))
@@ -95,12 +107,22 @@ class StyleLearningTests(unittest.TestCase):
         self.unset_env()
         self.assertEqual([r["id"] for r in learning.select_context(self.package)["rules"]], ["SAMPLE-001"])
 
-    def test_missing_env_directory_falls_back_without_using_home(self):
+    def test_workspace_argument_beats_env_and_missing_one_does_not_substitute(self):
+        other = self.root / "argument-ws"
+        shutil.copytree(FIXTURE, other)
+        rules = other / RULES
+        rules.write_text(rules.read_text("utf-8").replace("## SAMPLE-001", "## ARG-001"), encoding="utf-8")
+        result = learning.select_context(self.package, workspace=other)
+        self.assertEqual((result["source"], [r["id"] for r in result["rules"]]), ("explicit", ["ARG-001"]))
+        result = learning.select_context(self.package, workspace=self.root / "absent")
+        self.assertEqual((result["route"], result["source"], result["rules"]), ("public-only", "explicit", []))
+
+    def test_missing_env_directory_falls_back_without_using_settings(self):
         self.home_personal()
         os.environ[ENV] = str(self.root / "absent")
         result = learning.select_context(self.package)
         self.assertEqual((result["route"], result["source"]), ("public-only", "env"))
-        self.assertIn("home not substituted", result["reason"])
+        self.assertIn("settings not substituted", result["reason"])
         self.assertEqual(result["rules"], [])
 
     def test_relative_env_path_rejected(self):
@@ -110,29 +132,29 @@ class StyleLearningTests(unittest.TestCase):
 
     def test_empty_env_value_means_unset(self):
         os.environ[ENV] = "  "
-        self.assertEqual(learning.select_context(self.package)["source"], "home")
+        self.assertEqual(learning.select_context(self.package)["source"], "settings")
 
     def test_empty_personal_directory_falls_back(self):
-        for path in self.personal.glob("*.md"):
+        for path in self.personal.rglob("*.md"):
             path.write_text("", encoding="utf-8")
         result = learning.select_context(self.package)
         self.assertEqual((result["route"], result["rules"]), ("public-only", []))
 
     def test_rules_without_profile_still_apply(self):
-        (self.personal / "writing-profile.md").unlink()
+        (self.personal / PROFILE).unlink()
         result = learning.select_context(self.package)
-        self.assertEqual(result["route"], "personal")
+        self.assertEqual(result["route"], "workspace")
         self.assertIsNone(result["profile"])
 
     def test_candidates_and_disabled_rules_do_not_apply(self):
-        path = self.personal / "writing-rules.md"
+        path = self.personal / RULES
         original = path.read_text(encoding="utf-8")
         for state in ("候选", "已停用"):
             path.write_text(original.replace("状态：已确认", "状态：" + state), encoding="utf-8")
             self.assertEqual(learning.select_context(self.package)["route"], "public-only")
 
     def test_unconfirmed_and_duplicate_ids_rejected(self):
-        path = self.personal / "writing-rules.md"
+        path = self.personal / RULES
         original = path.read_text(encoding="utf-8")
         path.write_text(original + "\n" + original, encoding="utf-8")
         self.assertEqual(learning.select_context(self.package)["rules"], [])
@@ -141,7 +163,7 @@ class StyleLearningTests(unittest.TestCase):
         self.assertEqual(learning.select_context(self.package)["route"], "public-only")
 
     def test_generic_rule_id_prefixes_parsed(self):
-        text = (self.personal / "writing-rules.md").read_text(encoding="utf-8")
+        text = (self.personal / RULES).read_text(encoding="utf-8")
         for prefix in ("DEMO", "ANY", "AB_C"):
             with self.subTest(prefix=prefix):
                 ids = [r["id"] for r in learning.parse_rules(text.replace("SAMPLE-", prefix + "-"))]
@@ -169,7 +191,7 @@ class StyleLearningTests(unittest.TestCase):
         self.assertEqual(result["rules"], [])
 
     def test_missing_public_resource_is_error(self):
-        (self.package / "references/内容写作技巧.md").unlink()
+        (self.package / "templates/内容工作台/写作技巧/内容写作技巧.md").unlink()
         with self.assertRaises(OSError):
             learning.select_context(self.package)
 
@@ -240,27 +262,27 @@ class StyleLearningTests(unittest.TestCase):
                                str(self.package / "scripts/style_learning.py"), "context", *args],
                               cwd=cwd, env=env, capture_output=True, text=True, encoding="utf-8")
 
-    def test_cross_project_cli_reads_personal_root_without_mutation(self):
+    def test_cross_project_cli_reads_workspace_without_mutation(self):
         other = self.root / "other-project"
         other.mkdir()
         before = self.snapshot(self.package, self.personal, self.home)
         result = self.run_context(other, isolated_env(self.home, self.personal))
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
-        self.assertEqual((data["route"], data["source"]), ("personal", "env"))
+        self.assertEqual((data["route"], data["source"]), ("workspace", "env"))
         result = self.run_context(other, isolated_env(self.home))
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
-        self.assertEqual((data["route"], data["source"]), ("public-only", "home"))
+        self.assertEqual((data["route"], data["source"]), ("public-only", "settings"))
         self.assertEqual(self.snapshot(self.package, self.personal, self.home), before)
         self.assertEqual(list(other.iterdir()), [])
         self.assertEqual(list(self.home.iterdir()), [])
 
-    def test_cli_home_fallback_and_public_only(self):
+    def test_cli_settings_fallback_and_public_only(self):
         target = self.home_personal()
         result = self.run_context(self.root, isolated_env(self.home))
         data = json.loads(result.stdout)
-        self.assertEqual((data["route"], data["source"]), ("personal", "home"))
+        self.assertEqual((data["route"], data["source"]), ("workspace", "settings"))
         self.assertEqual(Path(data["source_path"]), target.resolve())
         data = json.loads(self.run_context(self.root, isolated_env(self.home, self.personal),
                                            "--public-only").stdout)
@@ -279,7 +301,7 @@ class StyleLearningTests(unittest.TestCase):
         self.assertEqual(before, self.snapshot(self.package, self.personal))
 
     def test_fixture_rules_include_scope_and_exceptions(self):
-        records = learning.parse_rules((FIXTURE / "writing-rules.md").read_text(encoding="utf-8"))
+        records = learning.parse_rules((FIXTURE / RULES).read_text(encoding="utf-8"))
         self.assertEqual({r["状态"] for r in records}, {"已确认", "候选", "已停用"})
         self.assertTrue(all(all(r[k] for k in learning.FIELDS) for r in records))
 

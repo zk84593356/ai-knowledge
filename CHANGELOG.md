@@ -1,5 +1,18 @@
 # 更新记录
 
+## 0.8.0 — 2026-10-17
+
+个人配置并入内容工作台，上手改为三步：初始化工作台 → 可选建品牌资产 → 复制提示词开始写。
+
+- 工作台初始化：新增 references/流程/工作台初始化.md。`create_project.py init` 把 `templates/内容工作台/` 整套复制进工作台（默认人设、工作台说明、风格参考、写作技巧、规范指南、品牌资产说明），已有文件不覆盖并逐个列出；建好 `我的项目/` 和 `品牌资产/`；把位置写进 `~/.ai-knowledge/settings.json`（已记了别的位置时不改，`--set-default` 切换，`--no-remember` 不写）。找不到工作台时先问作者要不要建，不建就写到 `docs/knowledge/` 并用 Skill 自带的默认文件。
+- 默认内容：写作技巧（内容写作技巧、金字塔原理写作技巧、偏航句用法）和规范指南（自媒体防限流指南、口播引导话术、自媒体动画、运营沉淀）从 references 移到 `templates/内容工作台/`，作为作者可以改的默认版本；新增默认 用户人设.md（状态：默认，按中性作者写）、风格参考/如何用 Grok Bot 做内容.md（公开文章的原创写法拆解，只有少量摘录和原文链接；初始化时可选把原文抓到作者本地）、写作规则/档案/改稿学习日志的空架子。
+- 个人风格：写作规则、档案、学习日志改为工作台 `风格参考/我的写作规则.md`、`我的写作档案.md`、`改稿学习日志.md`；工作台的 `写作技巧/内容写作技巧.md` 覆盖 Skill 自带版本。`AI_KNOWLEDGE_PERSONAL` 和 `~/.ai-knowledge/personal/` 不再读取，迁移方法见安装说明。
+- 视觉品牌：品牌放在工作台 `品牌资产/<brand-id>/`，可以有多个，目录名必须等于 `brandId`。去掉"默认品牌"：写文章时列出已确认的品牌，在确认角度时问作者用哪个，答案写进需求卡新增的"配图品牌"字段；草稿品牌只在点名时使用。新增 `create_project.py brand <brand-id> [--name]` 建品牌骨架。
+- 脚本：style_learning.py `context`、visual_assets.py `context` 与 `list` 新增 `--workspace`；`visual_assets.py context --visual` 不带品牌名时只返回 `available`（已确认品牌列表）。
+- 目录：references 分为 流程/、调研/、写作/、风格/、视觉/ 子目录（用户人设-快速参考.md 改名为 流程/用户人设.md）；模板分为 templates/文章/ 和 templates/品牌/（原 templates/brand/）。
+- 测试：夹具 tests/fixtures/personal-demo 改为 workspace-demo（风格参考/、品牌资产/demo-brand、品牌资产/demo-draft）；validate.py 检查新路径、默认文件清单和默认文件内的链接不越界；test_workspace.py 覆盖 init 逐字节复制、不覆盖、settings.json 记录与切换、brand 命令；style/visual 测试改为工作台查找顺序并覆盖 `--workspace`。
+- 文档：README 改为三步上手和"内容工作台里有什么"；安装说明新增 v0.7 → v0.8 升级；架构说明、使用示例、content-workflow.md、tests/README.md、AGENTS.md 同步。
+
 ## 0.7.0 — 2026-10-17
 
 从"写一篇技术文章"扩展为一套内容创作流程，按 docs/content-workflow.md（v0.2）实现。

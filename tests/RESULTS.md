@@ -1,5 +1,25 @@
 # 实际验收记录
 
+## v0.8.0 个人配置并入内容工作台 — 2026-10-17
+
+references 分目录，写作技巧和规范指南成为工作台默认内容，个人风格和多品牌放进工作台，新增工作台初始化流程和 `create_project.py brand`。
+
+| 命令/检查 | 本轮结果 |
+| --- | --- |
+| python -m unittest discover -s tests | 179 项：178 通过、1 跳过（符号链接权限，同前）。第一次跑有 1 项失败：test_validation 仍删旧路径 references/发布合同.md，改成新路径并加上默认文件缺失的断言后通过 |
+| python tests/validate.py | PASS，0 项发现。中途一次 FAIL 14 项：README、使用示例、复盘演示、tests/README 和夹具里还链着 personal-demo 和旧文件名，逐个改掉后通过 |
+| python tests/validate.py --bundle（两篇示范） | 均 PASS |
+| python skills/ai-knowledge/scripts/visual_assets.py bundle（两篇示范） | ok，0 错误 |
+| CLI 冒烟（tests/.tmp，临时主目录） | `init` 建出 29 项并写入 settings.json；重跑列出 14 个 kept existing，提示"already set"；`brand blue-cat`、`new oidc-login` 自动用 settings.json 里的工作台；`style_learning.py context` 回退公共规则（规则空架子没有已确认条目）；`visual_assets.py context --visual` 返回通用图解，`list` 把未填写的 blue-cat 骨架标为 ok: false |
+| 全仓库文本扫描 | `AI_KNOWLEDGE_PERSONAL`、personal-demo、writing-rules.md 等旧名只出现在更新记录、本记录、安装说明的升级说明和工作台初始化的迁移表里 |
+| node tests/check-mermaid.mjs | 跳过：PATH 上的 Node 仍是 v12。architecture.md 的流程图本轮没改 |
+
+没有验证的：
+
+- 初始化、选品牌、迁移这几段 Agent 流程只做了文字审读，没有让 Agent 在新会话里从头跑一遍；抓取范例原文的步骤没有实际执行。
+- 风格参考/如何用 Grok Bot 做内容.md 的摘录对照原文页面核对过（2026-10-17 访问），拆解部分是本仓库的分析，不代表原作者观点。
+- 讲解、复盘、测评、观点的 tests/cases 用例没有按新路径重跑；改动只涉及文件位置和品牌选择，写作规则本身没改。
+
 ## v0.7.0 内容创作流程 — 2026-10-17
 
 四种内容类型、11 步流程、内容工作台、参考文档中文文件名、13 份新参考文档、5 个新模板、两个工作台脚本。

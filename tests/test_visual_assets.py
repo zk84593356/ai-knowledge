@@ -1,6 +1,6 @@
 """Behavior tests for visual routing, integrity, publishable formats and approval boundaries.
 
-The brand kit comes from tests/fixtures/personal-demo/visual; the real home directory is
+The brand kit comes from tests/fixtures/workspace-demo/品牌资产/demo-brand; the real home directory is
 replaced by an empty temporary one in every test.
 """
 import hashlib
@@ -19,8 +19,8 @@ from bundle_fixtures import SVG, asset_record, png_bytes, write_bundle
 from validate import ROOT, validate_bundle as core_bundle
 
 PACKAGE = ROOT / "skills/ai-knowledge"
-PERSONAL = ROOT / "tests/fixtures/personal-demo"
-KIT = PERSONAL / "visual"
+PERSONAL = ROOT / "tests/fixtures/workspace-demo"
+KIT = PERSONAL / "品牌资产/demo-brand"
 spec = importlib.util.spec_from_file_location("visual", PACKAGE / "scripts/visual_assets.py")
 visual = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(visual)
@@ -59,11 +59,18 @@ class VisualTests(unittest.TestCase):
     def personal_copy(self, target, brand_id=None):
         shutil.copytree(PERSONAL, target)
         if brand_id:
-            path = target / "visual/brand-kit.json"
+            kit = target / "品牌资产" / brand_id
+            (target / "品牌资产/demo-brand").rename(kit)
+            path = kit / "brand-kit.json"
             data = json.loads(path.read_text("utf-8"))
             data["brandId"] = brand_id
             path.write_text(json.dumps(data), encoding="utf-8")
         return target
+
+    def remember(self, workspace):
+        (self.home / ".ai-knowledge").mkdir(exist_ok=True)
+        (self.home / ".ai-knowledge/settings.json").write_text(
+            json.dumps({"workspace": str(workspace)}), encoding="utf-8")
 
     def save(self):
         self.manifest_path.write_text(json.dumps(self.manifest), encoding="utf-8")
@@ -113,49 +120,59 @@ class VisualTests(unittest.TestCase):
             result = visual.select_context(visual=True, no_brand=True, brand=KIT)
             self.assertEqual((result["route"], result["brand"]), ("generic", None))
 
-    def test_no_personal_config_anywhere_is_generic(self):
+    def test_no_workspace_anywhere_is_generic(self):
         self.assertFalse((PACKAGE / "styles").exists())
         result = visual.select_context(visual=True)
-        self.assertEqual((result["route"], result["source"]), ("generic", "home"))
-        self.assertEqual(Path(result["source_path"]), (self.home / ".ai-knowledge/personal").resolve())
+        self.assertEqual((result["route"], result["source"], result["source_path"]), ("generic", "settings", None))
 
-    def test_env_kit_loads_without_promoting_palette(self):
+    def test_env_kit_loads_by_name_without_promoting_palette(self):
         os.environ[ENV] = str(PERSONAL)
-        result = visual.select_context(visual=True)
-        self.assertEqual((result["route"], result["source"]), ("personal", "env"))
+        result = visual.select_context(visual=True, brand_id="demo-brand")
+        self.assertEqual((result["route"], result["source"]), ("named", "named"))
         self.assertEqual(Path(result["brand"]), KIT.resolve())
-        self.assertEqual(result["brandId"], "personal-demo")
+        self.assertEqual(result["brandId"], "demo-brand")
         self.assertEqual(result["approval"]["brandPalette"], "proposed")
 
-    def test_home_default_used_when_env_unset(self):
-        target = self.personal_copy(self.home / ".ai-knowledge/personal")
-        result = visual.select_context(visual=True)
-        self.assertEqual((result["route"], result["source"]), ("personal", "home"))
-        self.assertEqual(Path(result["brand"]), (target / "visual").resolve())
+    def test_settings_workspace_used_when_env_unset(self):
+        target = self.personal_copy(self.root / "ws")
+        self.remember(target)
+        result = visual.select_context(visual=True, brand_id="demo-brand")
+        self.assertEqual(result["route"], "named")
+        self.assertEqual(Path(result["brand"]), (target / "品牌资产/demo-brand").resolve())
+        self.assertEqual(visual.select_context(visual=True)["available"], ["demo-brand"])
 
-    def test_precedence_explicit_then_env_then_home(self):
-        self.personal_copy(self.home / ".ai-knowledge/personal", "home-kit")
-        env_root = self.personal_copy(self.root / "env-personal", "env-kit")
-        explicit = self.personal_copy(self.root / "explicit-personal", "explicit-kit") / "visual"
+    def test_precedence_explicit_then_env_then_settings(self):
+        self.remember(self.personal_copy(self.root / "settings-ws", "settings-kit"))
+        env_root = self.personal_copy(self.root / "env-ws", "env-kit")
+        explicit = self.personal_copy(self.root / "explicit-ws", "explicit-kit") / "品牌资产/explicit-kit"
         os.environ[ENV] = str(env_root)
         self.assertEqual(visual.select_context(visual=True, brand=explicit)["brandId"], "explicit-kit")
-        self.assertEqual(visual.select_context(visual=True)["brandId"], "env-kit")
+        self.assertEqual(visual.select_context(visual=True)["available"], ["env-kit"])
         os.environ.pop(ENV)
-        self.assertEqual(visual.select_context(visual=True)["brandId"], "home-kit")
+        self.assertEqual(visual.select_context(visual=True)["available"], ["settings-kit"])
 
-    def test_missing_env_directory_does_not_use_home(self):
-        self.personal_copy(self.home / ".ai-knowledge/personal")
+    def test_workspace_argument_beats_env(self):
+        os.environ[ENV] = str(self.personal_copy(self.root / "env-ws", "env-kit"))
+        argument = self.personal_copy(self.root / "arg-ws", "arg-kit")
+        self.assertEqual(visual.select_context(visual=True, workspace=argument)["available"], ["arg-kit"])
+        result = visual.select_context(visual=True, workspace=argument, brand_id="arg-kit")
+        self.assertEqual((result["route"], result["brandId"]), ("named", "arg-kit"))
+        self.assertEqual([k["brandId"] for k in visual.list_kits(argument)["kits"]], ["arg-kit", "demo-draft"])
+
+    def test_missing_env_directory_does_not_use_settings(self):
+        self.remember(self.personal_copy(self.root / "ws"))
         for value in (str(self.root / "absent"), "relative/personal"):
             with self.subTest(value=value):
                 os.environ[ENV] = value
-                result = visual.select_context(visual=True)
+                result = visual.select_context(visual=True, brand_id="demo-brand")
                 self.assertEqual((result["route"], result["source"], result["brand"]), ("generic", "env", None))
 
-    def test_broken_personal_kit_falls_back(self):
+    def test_broken_workspace_kit_falls_back(self):
         target = self.personal_copy(self.root / "broken")
-        (target / "visual/brand-kit.json").write_text("{", encoding="utf-8")
+        (target / "品牌资产/demo-brand/brand-kit.json").write_text("{", encoding="utf-8")
         os.environ[ENV] = str(target)
-        result = visual.select_context(visual=True)
+        self.assertEqual(visual.select_context(visual=True)["available"], [])
+        result = visual.select_context(visual=True, brand_id="demo-brand")
         self.assertEqual((result["route"], result["brand"]), ("generic", None))
         self.assertTrue(result["issues"])
 
@@ -340,10 +357,10 @@ class VisualTests(unittest.TestCase):
         shutil.copytree(self.topic, moved)
         before = {p.relative_to(package): hashlib.sha256(p.read_bytes()).hexdigest()
                   for p in package.rglob("*") if p.is_file()}
-        for personal, route in ((None, "generic"), (PERSONAL, "personal")):
+        for personal, route in ((None, "generic"), (PERSONAL, "named")):
             run = subprocess.run([sys.executable, "-B", str(package / "scripts/visual_assets.py"),
-                                  "context", "--visual"], cwd=moved, capture_output=True,
-                                 env=isolated_env(self.home, personal))
+                                  "context", "--visual", "--brand-id", "demo-brand"], cwd=moved,
+                                 capture_output=True, env=isolated_env(self.home, personal))
             self.assertEqual(run.returncode, 0, run.stderr)
             self.assertEqual(json.loads(run.stdout)["route"], route)
         self.assertEqual(list(self.home.iterdir()), [])

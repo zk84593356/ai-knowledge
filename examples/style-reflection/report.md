@@ -1,7 +1,7 @@
 # 文章复盘学习演示
 
 日期：2026-10-14；执行者：开发主 Agent。
-输入为明确原创模拟的 [SSO 初稿](../../tests/fixtures/style-reflection/sso-draft.md)、[SSO 终稿](../../tests/fixtures/style-reflection/sso-final.md)、[缓存初稿](../../tests/fixtures/style-reflection/cache-draft.md)、[缓存终稿](../../tests/fixtures/style-reflection/cache-final.md)。没有真实用户亲自改稿或满意确认；不写入任何个人配置的习惯和支持次数。
+输入为明确原创模拟的 [SSO 初稿](../../tests/fixtures/style-reflection/sso-draft.md)、[SSO 终稿](../../tests/fixtures/style-reflection/sso-final.md)、[缓存初稿](../../tests/fixtures/style-reflection/cache-draft.md)、[缓存终稿](../../tests/fixtures/style-reflection/cache-final.md)。没有真实用户亲自改稿或满意确认；不写入任何作者工作台的习惯和支持次数。
 
 ## 实际比较
 
@@ -27,7 +27,7 @@
 - 支持次数：首次为 1，第二篇后为 2；重新处理同一组仍为 2。
 - 例外：主观感受可明确归属；未提供测量数据时不能凭空填数。
 - 状态：候选；两篇重复也没有用户对永久习惯的确认。
-- 现有规则：本演示对照合成的 [演示个人配置](../../tests/fixtures/personal-demo/writing-rules.md)，其中没有同义的已确认条目，候选也不写入该文件。真实场景中先查用户个人配置目录（`AI_KNOWLEDGE_PERSONAL` 或 `~/.ai-knowledge/personal`）里的已有规则；有同义条目时只在有授权且证据可公开时补到已有规则，保留其 ID，不另建副本。
+- 现有规则：本演示对照合成的 [演示写作规则](../../tests/fixtures/workspace-demo/风格参考/我的写作规则.md)，其中没有同义的已确认条目，候选也不写入该文件。真实场景中先查作者内容工作台 `风格参考/我的写作规则.md` 里的已有规则；有同义条目时只在有授权且证据可公开时补到已有规则，保留其 ID，不另建副本。
 - 相邻观察：删空泛预告已由公共写作约定覆盖，也不新增副本。
 
 ```text
@@ -39,7 +39,7 @@ demo-cache final 5d84a6cb85217bb546e36158b767aa95d1377f353dc0373d81ba7caeba94a21
 
 ## 公共规则候选检查
 
-“用具体事实替代空泛评价”可跨主题使用，但 [公共写作约定](../../skills/ai-knowledge/references/内容写作技巧.md) 已要求具体主语与动作，[质量检查](../../skills/ai-knowledge/references/打磨与核验.md) 已要求证据和信息密度。“删无信息重复”也已覆盖。本次结论为已覆盖，拟修改内容为无，不为了展示学习而重复增加规则。
+“用具体事实替代空泛评价”可跨主题使用，但 [公共写作约定](../../skills/ai-knowledge/templates/内容工作台/写作技巧/内容写作技巧.md) 已要求具体主语与动作，[质量检查](../../skills/ai-knowledge/references/流程/打磨与核验.md) 已要求证据和信息密度。“删无信息重复”也已覆盖。本次结论为已覆盖，拟修改内容为无，不为了展示学习而重复增加规则。
 
 如果以后发现未覆盖技巧，报告必须列目标位置、准确提案文字、跨主题证据和例外，等待用户确认后再改公共文件。个人的称呼或标点偏好不属于可自动推广的公共规则。
 
@@ -49,6 +49,6 @@ demo-cache final 5d84a6cb85217bb546e36158b767aa95d1377f353dc0373d81ba7caeba94a21
 
 ## 写入与限制
 
-实际新增的是本报告和四篇演示素材。运行只读比较、重复支持合并测试期间，安装包、演示个人配置与公共规则文件字节未改变。个人配置不在仓库内，本演示没有读取或写入任何真实个人配置的 learning-log，也没有记录这两次模拟学习。
+实际新增的是本报告和四篇演示素材。运行只读比较、重复支持合并测试期间，安装包、演示工作台与公共规则文件字节未改变。作者的工作台不在仓库内，本演示没有读取或写入任何真实工作台的改稿学习日志，也没有记录这两次模拟学习。
 
 这是主 Agent 按新流程执行的演示，不是长期真人学习效果或所有宿主的安全保证。工具给出文字差异，编辑目的、同义判断、事实准确性与公开许可仍需审读。

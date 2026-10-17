@@ -25,7 +25,7 @@ def load(name):
 create = load("create_project")
 save = load("save_article")
 CLEAN_ENV = {k: v for k, v in os.environ.items()
-             if k not in {"AI_KNOWLEDGE_WORKSPACE", "AI_KNOWLEDGE_PERSONAL"}}
+             if k != "AI_KNOWLEDGE_WORKSPACE"}
 
 
 def quiet(func, *args):
@@ -48,54 +48,113 @@ class WorkspaceTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def test_init_creates_layout_without_overwriting(self):
-        quiet(create.main, ["init", "--workspace", str(self.ws)])
-        for relative in ("用户人设.md", "风格参考", "写作技巧", "规范指南", "我的项目/_briefs",
-                         "我的项目/_knowledge_base", "我的项目/_协作文档", "我的项目/公众号写作",
-                         "我的项目/推文写作", "我的项目/短视频逐字稿", "我的项目/历史存档/公众号写作"):
-            self.assertTrue((self.ws / relative).exists(), relative)
+    def init(self, *extra):
+        return quiet(create.main, ["init", "--workspace", str(self.ws), *extra])
+
+    def settings(self):
+        path = self.root / "home/.ai-knowledge/settings.json"
+        return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+
+    def test_init_copies_seed_content_and_project_layout(self):
+        self.init()
+        seed = SCRIPTS.parent / "templates/内容工作台"
+        files = [p for p in seed.rglob("*") if p.is_file()]
+        self.assertGreaterEqual(len(files), 10)
+        for path in files:
+            relative = path.relative_to(seed)
+            self.assertEqual((self.ws / relative).read_bytes(), path.read_bytes(), relative)
+        for relative in ("我的项目/_briefs", "我的项目/_knowledge_base", "我的项目/_协作文档",
+                         "我的项目/公众号写作", "我的项目/推文写作", "我的项目/短视频逐字稿",
+                         "我的项目/历史存档/公众号写作", "品牌资产"):
+            self.assertTrue((self.ws / relative).is_dir(), relative)
+
+    def test_init_never_overwrites_and_reports_kept_files(self):
+        self.init()
         persona = self.ws / "用户人设.md"
         persona.write_text("# 我自己的人设\n", encoding="utf-8")
-        quiet(create.main, ["init", "--workspace", str(self.ws)])
+        (self.ws / "规范指南/运营沉淀.md").unlink()
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            create.main(["init", "--workspace", str(self.ws)])
         self.assertEqual(persona.read_text(encoding="utf-8"), "# 我自己的人设\n")
+        self.assertIn("kept existing: 用户人设.md", out.getvalue())
+        self.assertIn("created: 规范指南/运营沉淀.md", out.getvalue())
+        self.assertTrue((self.ws / "规范指南/运营沉淀.md").is_file())
+
+    def test_init_records_default_workspace_once(self):
+        self.init()
+        self.assertEqual(self.settings(), {"workspace": self.ws.resolve().as_posix()})
+        other = self.root / "另一个"
+        quiet(create.main, ["init", "--workspace", str(other)])
+        self.assertEqual(self.settings(), {"workspace": self.ws.resolve().as_posix()})
+        quiet(create.main, ["init", "--workspace", str(other), "--set-default"])
+        self.assertEqual(self.settings(), {"workspace": other.resolve().as_posix()})
+
+    def test_init_no_remember_leaves_settings_alone(self):
+        self.init("--no-remember")
+        self.assertIsNone(self.settings())
+        self.assertTrue((self.ws / "用户人设.md").is_file())
+
+    def test_brand_creates_skeleton_and_refuses_existing(self):
+        self.init()
+        quiet(create.main, ["brand", "blue-cat", "--name", "蓝猫", "--workspace", str(self.ws)])
+        root = self.ws / "品牌资产/blue-cat"
+        kit = json.loads((root / "brand-kit.json").read_text(encoding="utf-8"))
+        self.assertEqual((kit["brandId"], kit["name"]), ("blue-cat", "蓝猫"))
+        for relative in ("assets/canonical", "assets/scenes", "candidates", "character.md", "style.md",
+                         "provenance.md"):
+            self.assertTrue((root / relative).exists(), relative)
+        for args in (["brand", "blue-cat"], ["brand", "Blue_Cat"], ["brand", "../x"]):
+            with self.subTest(args=args), self.assertRaises(SystemExit):
+                quiet(create.main, [*args, "--workspace", str(self.ws)])
+
+    def test_commands_other_than_init_need_existing_workspace(self):
+        for args in (["new", "oidc-login"], ["brand", "blue-cat"]):
+            with self.subTest(args=args), self.assertRaises(SystemExit):
+                quiet(create.main, [*args, "--workspace", str(self.ws)])
+        self.assertFalse(self.ws.exists())
 
     def test_new_project_gets_dated_folder_brief_and_suffix(self):
+        self.init()
         quiet(create.main, ["new", "oidc-login", "--workspace", str(self.ws), "--date", "20261017"])
         projects = self.ws / "我的项目"
         self.assertTrue((projects / "公众号写作/20261017-oidc-login/assets").is_dir())
-        self.assertIn("需求卡", (projects / "_briefs/20261017-oidc-login.md").read_text(encoding="utf-8"))
+        brief = (projects / "_briefs/20261017-oidc-login.md").read_text(encoding="utf-8")
+        self.assertIn("需求卡", brief)
+        self.assertIn("配图品牌", brief)
         quiet(create.main, ["new", "oidc-login", "--workspace", str(self.ws), "--date", "20261017"])
         self.assertTrue((projects / "公众号写作/20261017-oidc-login-02").is_dir())
         self.assertTrue((projects / "_briefs/20261017-oidc-login-02.md").is_file())
 
     def test_invalid_slug_or_date_rejected(self):
+        self.init()
         for args in (["new", "OIDC", "--workspace", str(self.ws)],
                      ["new", "../x", "--workspace", str(self.ws)],
                      ["new", "con", "--workspace", str(self.ws)],
                      ["new", "ok", "--workspace", str(self.ws), "--date", "2026-10-17"]):
             with self.subTest(args=args), self.assertRaises(SystemExit):
                 quiet(create.main, args)
-        self.assertFalse((self.ws / "我的项目/公众号写作").exists())
+        self.assertEqual(list((self.ws / "我的项目/公众号写作").iterdir()), [])
 
     def test_workspace_lookup_order(self):
         with self.assertRaises(SystemExit):
             create.resolve_workspace()
-        personal = self.root / "personal"
-        personal.mkdir()
-        (personal / "settings.json").write_text(json.dumps({"workspace": str(self.ws)}), encoding="utf-8")
-        os.environ["AI_KNOWLEDGE_PERSONAL"] = str(personal)
+        settings = self.root / "home/.ai-knowledge/settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({"workspace": str(self.ws)}), encoding="utf-8")
         self.assertEqual(create.resolve_workspace(), (self.ws, "settings.json"))
         os.environ["AI_KNOWLEDGE_WORKSPACE"] = str(self.root / "env-ws")
         self.assertEqual(create.resolve_workspace(), (self.root / "env-ws", "AI_KNOWLEDGE_WORKSPACE"))
         self.assertEqual(create.resolve_workspace(str(self.ws)), (self.ws, "argument"))
 
     def test_broken_settings_is_an_error(self):
-        personal = self.root / "personal"
-        personal.mkdir()
-        (personal / "settings.json").write_text("{not json", encoding="utf-8")
-        os.environ["AI_KNOWLEDGE_PERSONAL"] = str(personal)
+        settings = self.root / "home/.ai-knowledge/settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text("{not json", encoding="utf-8")
         with self.assertRaises(SystemExit):
             create.resolve_workspace()
+        with self.assertRaises(SystemExit):
+            self.init()
 
     def project(self, name="20261017-oidc-login"):
         quiet(create.main, ["init", "--workspace", str(self.ws)])

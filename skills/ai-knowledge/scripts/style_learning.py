@@ -2,9 +2,11 @@
 These helpers never update rules, run Git, install packages, or call a network API.
 Semantic approval, privacy review and actual source edits belong to the Agent workflow.
 
-Personal config is never bundled. Lookup order: --profile <file>, then the directory in
-AI_KNOWLEDGE_PERSONAL, then ~/.ai-knowledge/personal. A personal root holds
-writing-rules.md, writing-profile.md and learning-log.md.
+Personal style lives in the author's content workspace, never in the package. Lookup
+order: --profile <file>, then --workspace <dir>, then AI_KNOWLEDGE_WORKSPACE, then
+"workspace" in ~/.ai-knowledge/settings.json. The workspace keeps 风格参考/我的写作规则.md,
+风格参考/我的写作档案.md and 风格参考/改稿学习日志.md; its 写作技巧/内容写作技巧.md
+overrides the bundled starter copy in templates/内容工作台/.
 """
 import argparse
 import copy
@@ -18,7 +20,11 @@ import sys
 
 FIELDS = ("规则", "适用范围", "修改原因", "来源文章", "修改证据", "支持次数", "例外", "状态", "确认依据")
 MAX_BYTES = 2 * 1024 * 1024
-ENV_VAR = "AI_KNOWLEDGE_PERSONAL"
+ENV_VAR = "AI_KNOWLEDGE_WORKSPACE"
+STYLE_DIR = "风格参考"
+RULES = "我的写作规则.md"
+PROFILE = "我的写作档案.md"
+CRAFT = "写作技巧/内容写作技巧.md"
 
 
 def read_text(path):
@@ -73,22 +79,30 @@ def contained_file(root, relative):
     return target
 
 
-def personal_root():
-    """Return (source, path) for the implicit personal root; path is None if unresolvable."""
+def workspace_root():
+    """Return (source, path) for the implicit workspace; path is None if unresolvable or unset."""
     value = os.environ.get(ENV_VAR, "").strip()
     if value:
         path = Path(value).expanduser()
         return "env", path if path.is_absolute() else None
     try:
-        return "home", Path.home() / ".ai-knowledge" / "personal"
+        settings = Path.home() / ".ai-knowledge" / "settings.json"
     except (RuntimeError, KeyError):
-        return "home", None
+        return "settings", None
+    try:
+        value = json.loads(read_text(settings)[1]).get("workspace") if settings.is_file() else None
+    except (OSError, ValueError, AttributeError):
+        value = None
+    if not isinstance(value, str) or not value.strip():
+        return "settings", None
+    path = Path(value).expanduser()
+    return "settings", path if path.is_absolute() else None
 
 
-def select_context(skill_root, public_only=False, profile=None):
+def select_context(skill_root, public_only=False, profile=None, workspace=None):
     root = Path(skill_root).resolve()
-    public = contained_file(root, "references/内容写作技巧.md")
-    read_text(public)  # Missing public rules are an error, not a silent fallback.
+    public = contained_file(root, "templates/内容工作台/" + CRAFT)
+    read_text(public)  # Missing bundled rules are an error, not a silent fallback.
     result = {"public": str(public), "route": "public-only", "source": None, "source_path": None,
               "profile": None, "rules": [], "reason": "personal style disabled",
               "semantic_review_required": True}
@@ -104,35 +118,43 @@ def select_context(skill_root, public_only=False, profile=None):
         except (OSError, ValueError):
             result["reason"] = "explicit profile unavailable; public rules only, do not substitute another config"
             return result
-        result.update(route="explicit", profile=str(path), reason="user-selected profile replaces personal config")
+        result.update(route="explicit", profile=str(path), reason="user-selected profile replaces workspace style")
         return result  # Explicit profiles can use legacy/freeform formats; Agent reviews them.
-    source, base = personal_root()
+    if workspace is not None:
+        path = Path(workspace).expanduser()
+        source, base = "explicit", path.absolute()
+    else:
+        source, base = workspace_root()
     result["source"] = source
     if base is None:
-        result["reason"] = (ENV_VAR + " is not an absolute path; public rules only" if source == "env"
-                            else "home directory unavailable; public rules only")
+        result["reason"] = {"env": ENV_VAR + " is not an absolute path; public rules only"}.get(
+            source, "no workspace recorded; public rules only")
         return result
     base = base.resolve()
     result["source_path"] = str(base)
     if not base.is_dir():
-        # A broken env setting must not silently fall through to the home directory.
-        result["reason"] = (ENV_VAR + " directory missing; public rules only, home not substituted"
-                            if source == "env" else "no personal config directory; public rules only")
+        # A broken env setting must not silently fall through to settings.json.
+        result["reason"] = {"env": ENV_VAR + " directory missing; public rules only, settings not substituted",
+                            "explicit": "workspace directory missing; public rules only, do not substitute another"}.get(
+            source, "recorded workspace missing; public rules only")
         return result
+    craft = base / CRAFT
+    if craft.is_file():
+        result["public"] = str(craft)
     try:
-        _, text = read_text(base / "writing-rules.md")
+        _, text = read_text(base / STYLE_DIR / RULES)
         records = [r for r in parse_rules(text) if r["状态"] == "已确认"
                    and r["确认依据"] not in {"无", "未提供", "待确认", "统计次数"}]
         if not records:
             raise ValueError("no eligible rules")
-        profile_path = base / "writing-profile.md"
+        profile_path = base / STYLE_DIR / PROFILE
         # Profile is optional; complete confirmed rules remain usable without it.
         profile_text = read_text(profile_path)[1] if profile_path.is_file() else ""
-        result.update(route="personal", rules=records,
+        result.update(route="workspace", rules=records,
                       profile=str(profile_path) if profile_text.strip() else None,
-                      reason="confirmed personal rules; Agent must check provenance and conflicts")
+                      reason="confirmed workspace rules; Agent must check provenance and conflicts")
     except (OSError, ValueError):
-        result["reason"] = "personal rules missing, empty, invalid, or without confirmed entries; public rules only"
+        result["reason"] = "workspace rules missing, empty, invalid, or without confirmed entries; public rules only"
     return result
 
 
@@ -183,12 +205,13 @@ def main(argv=None):
     context.add_argument("--skill-root", type=Path, default=Path(__file__).resolve().parents[1])
     context.add_argument("--public-only", action="store_true")
     context.add_argument("--profile", type=Path)
+    context.add_argument("--workspace", type=Path)
     compare = sub.add_parser("compare")
     compare.add_argument("--draft", type=Path)
     compare.add_argument("--final", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
-        result = (select_context(args.skill_root, args.public_only, args.profile) if args.command == "context"
+        result = (select_context(args.skill_root, args.public_only, args.profile, args.workspace) if args.command == "context"
                   else compare_versions(args.final, args.draft))
         print(json.dumps(result, ensure_ascii=False, indent=2))
     except (OSError, ValueError):

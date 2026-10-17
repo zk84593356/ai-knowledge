@@ -341,14 +341,16 @@ class SkillPackageTests(unittest.TestCase):
     def test_missing_contract_resources_reported(self):
         target = self.root / "ai-knowledge"
         shutil.copytree(ROOT / "skills/ai-knowledge", target, ignore=shutil.ignore_patterns("__pycache__"))
-        for relative in ("references/发布合同.md", "templates/article-template.md",
-                         "templates/review-template.md", "scripts/visual_assets.py"):
+        for relative in ("references/流程/发布合同.md", "templates/文章/article-template.md",
+                         "templates/文章/review-template.md", "scripts/visual_assets.py",
+                         "templates/内容工作台/用户人设.md"):
             path = target / relative
             if path.exists():
                 path.unlink()
         errors = validate_skill(target)
-        for message in ("missing reference: 发布合同", "missing template: article",
-                        "missing template: review", "missing script: scripts/visual_assets.py"):
+        for message in ("missing reference: 流程/发布合同", "missing template: article",
+                        "missing template: review", "missing script: scripts/visual_assets.py",
+                        "missing workspace starter file: 用户人设.md"):
             self.assertIn(message, errors)
 
     def test_real_package_passes_validate_skill(self):

@@ -2,7 +2,7 @@
 
 本项目的 Skill 由 Agent 执行，测试分为生成走查、程序检查、内容审读和真实宿主验收四层。脚本不会自动调用模型，也不会根据标题匹配就给教学质量打高分。
 
-每个主题的产物是一篇可发表的 `article.md`、一份只给作者看的 `review.md`，以及按需的 `assets/`（PNG 图片、`manifest.json` 和可编辑 SVG 源）。合同见 [发布合同](../skills/ai-knowledge/references/发布合同.md)。
+每个主题的产物是一篇可发表的 `article.md`、一份只给作者看的 `review.md`，以及按需的 `assets/`（PNG 图片、`manifest.json` 和可编辑 SVG 源）。合同见 [发布合同](../skills/ai-knowledge/references/流程/发布合同.md)。
 
 ## 可重复运行的自动检查
 
@@ -64,7 +64,7 @@ Windows 脚本使用已安装的 Edge；其他系统使用 Playwright Chromium�
 
 [边界用例](cases/boundaries.md) 覆盖离线、证据缺失、提示注入、非技术英文、自定义路径、重复生成、不要图和核验状态。内容走查与宿主实际执行必须分别记录；只有真的写入两次并比较旧文件，才能称为冲突保护行为测试。
 
-内容审读按 [打磨与核验](../skills/ai-knowledge/references/打磨与核验.md) 的四遍打磨与阻断项进行。结论必须附依据，事实与证据真实性为硬门槛。`review.md` 里的"已核验"只能来自独立复查（新会话、子 Agent 或用户），不能由同一生成 Agent 的自评代替；真人学习效果需要用户另行阅读与回答问题。
+内容审读按 [打磨与核验](../skills/ai-knowledge/references/流程/打磨与核验.md) 的四遍打磨与阻断项进行。结论必须附依据，事实与证据真实性为硬门槛。`review.md` 里的"已核验"只能来自独立复查（新会话、子 Agent 或用户），不能由同一生成 Agent 的自评代替；真人学习效果需要用户另行阅读与回答问题。
 
 实际结果见 [RESULTS.md](RESULTS.md)。
 
@@ -83,33 +83,34 @@ python skills/ai-knowledge/scripts/analyze_style.py examples/concept-sso/article
 
 Agent 行为与文风审读输入见 [风格用例](cases/style-engine.md)。人工走查不能用几个禁用词的字符串匹配替代，也不等于真人审美认可。
 
-`test_style_learning.py` 验证个人配置根目录的查找顺序（显式 `--profile` > 环境变量 `AI_KNOWLEDGE_PERSONAL` > `~/.ai-knowledge/personal`）、环境变量指向不存在的目录时回退公共规则且不改读主目录、缺失/空白/无效回退、`--public-only`、通用规则 ID（`<大写前缀>-<三位以上数字>`）、准确 diff、仅终稿、证据去重、候选不自动确认，以及从其他工作目录运行安装副本时没有文件变化。测试使用合成的 [演示个人配置](fixtures/personal-demo/README.md) 的临时副本，并把主目录替换为空的临时目录（进程内替换 `Path.home`，子进程设置 `HOME` 与 `USERPROFILE`），不读取真实用户目录。
+`test_style_learning.py` 验证内容工作台的查找顺序（显式 `--profile` > `--workspace` > 环境变量 `AI_KNOWLEDGE_WORKSPACE` > `~/.ai-knowledge/settings.json` 的 `workspace`）、规则读自工作台 `风格参考/我的写作规则.md`、工作台的 `写作技巧/内容写作技巧.md` 覆盖 Skill 自带版本、环境变量或参数指向不存在的目录时回退公共规则且不改读 settings.json、缺失/空白/无效回退、`--public-only`、通用规则 ID（`<大写前缀>-<三位以上数字>`）、准确 diff、仅终稿、证据去重、候选不自动确认，以及从其他工作目录运行安装副本时没有文件变化。测试使用合成的 [演示内容工作台](fixtures/workspace-demo/README.md) 的临时副本，并把主目录替换为空的临时目录（进程内替换 `Path.home`，子进程设置 `HOME` 与 `USERPROFILE`），不读取真实用户目录。
 
 ```powershell
 python skills/ai-knowledge/scripts/style_learning.py context
-$env:AI_KNOWLEDGE_PERSONAL = (Resolve-Path tests/fixtures/personal-demo).Path
-python skills/ai-knowledge/scripts/style_learning.py context
-Remove-Item Env:AI_KNOWLEDGE_PERSONAL
+python skills/ai-knowledge/scripts/style_learning.py context --workspace tests/fixtures/workspace-demo
 python skills/ai-knowledge/scripts/style_learning.py context --public-only
 python skills/ai-knowledge/scripts/style_learning.py compare --draft tests/fixtures/style-reflection/sso-draft.md --final tests/fixtures/style-reflection/sso-final.md
 python skills/ai-knowledge/scripts/style_learning.py compare --final tests/fixtures/style-reflection/sso-final.md
 ```
 
-Skill 不附带任何个人配置。个人配置放在用户本地：环境变量 `AI_KNOWLEDGE_PERSONAL` 指向的目录，或 `~/.ai-knowledge/personal`；根目录下是 `writing-rules.md`、`writing-profile.md`、`learning-log.md`，默认品牌在 `visual/`，其他品牌在 `brands/<brand-id>/`。都没有时使用公共写作规则和通用图解。`validate.py` 要求安装包内不存在 `styles/personal`，仓库级检查还会在 `skills/` 与 `examples/` 的文件名和内容里查找原私人配置的标识，防止私人配置回流；`docs/`、`CHANGELOG.md` 与 `tests/RESULTS.md` 保留历史记录，不在此检查范围。演示配置的三份 Markdown、已确认的 `visual/` 品牌和草稿品牌 `brands/demo-draft/` 也由仓库级检查验证。
+Skill 不附带任何个人配置。个人资料都在作者的内容工作台里：`风格参考/` 下是 `我的写作规则.md`、`我的写作档案.md`、`改稿学习日志.md`，品牌在 `品牌资产/<brand-id>/`。没有工作台时使用 Skill 自带的默认文件和通用图解。`validate.py` 要求安装包内不存在 `styles/personal`，仓库级检查还会在 `skills/` 与 `examples/` 的文件名和内容里查找原私人配置的标识，防止私人配置回流；`docs/`、`CHANGELOG.md` 与 `tests/RESULTS.md` 保留历史记录，不在此检查范围。演示工作台的三份 Markdown、已确认品牌 `demo-brand` 和草稿品牌 `demo-draft` 也由仓库级检查验证；`templates/内容工作台/` 的每个默认文件必须存在，且其中的相对链接不越出这套默认文件。
+
+`test_workspace.py` 覆盖 `create_project.py`：`init` 把 `templates/内容工作台/` 逐字节复制进工作台并建好 `我的项目/` 与 `品牌资产/`、重跑只补缺失文件且列出保留的文件、首次把位置记进 `~/.ai-knowledge/settings.json` 而已记录其他位置时不改（`--set-default` 才切换，`--no-remember` 不写）、`brand` 建品牌骨架并拒绝已存在或非法的 ID、`new` 和 `brand` 要求工作台已存在、需求卡含配图品牌字段、settings.json 损坏时报错，以及 `save_article.py` 的归档。
 
 测试脚本不证明某次风格改写的事实一定正确，也不能代替宿主写回权限检查。事实不变、公共提案确认、源路径未知与隐私边界由 [复盘用例](cases/style-reflection.md) 记录主 Agent 的实际决策，不伪装成自动语义测试。
 
 ## 视觉检查
 
-`test_visual_assets.py` 覆盖按需读取、品牌包查找顺序（显式 `--brand` > `--brand-id` > `$AI_KNOWLEDGE_PERSONAL/visual` > `~/.ai-knowledge/personal/visual`）、环境变量失效时不改读主目录、`--no-brand`、指定/损坏/缺失回退通用图解、图片边界与哈希、危险 SVG、草稿状态、缺图与未登记图片、文章只嵌 PNG/JPEG、无图主题不要求台账、有图或有 assets/ 时必须有台账、品牌版本一致性、迁移目录及安装包只读。
+`test_visual_assets.py` 覆盖按需读取、品牌查找顺序（显式 `--brand` > `--workspace` > 环境变量 `AI_KNOWLEDGE_WORKSPACE` > `~/.ai-knowledge/settings.json`，品牌都在 `品牌资产/<brand-id>/`）、不带品牌名时只返回已确认品牌列表而不自动选用、环境变量失效时不改读 settings.json、`--no-brand`、指定/损坏/缺失回退通用图解、图片边界与哈希、危险 SVG、草稿状态、缺图与未登记图片、文章只嵌 PNG/JPEG、无图主题不要求台账、有图或有 assets/ 时必须有台账、品牌版本一致性、迁移目录及安装包只读。
 
-`test_brand_kit.py` 覆盖精简品牌格式（`schemaVersion` 必须为 `"2"`，三份规范必须存在，字段取值、配色、identity 必须指向已登记的母版）、已确认品牌的母版必须已确认、默认位置的草稿不自动使用、`--brand-id` 按名字选用草稿且缺失或非法时不替换、环境变量失效时不改读主目录、`list` 列出默认和其他品牌、`inspect` 报告登记与校验值且不写文件、四个模板填好后能通过检查，以及命令行参数互斥。
+`test_brand_kit.py` 覆盖精简品牌格式（`schemaVersion` 必须为 `"2"`，三份规范必须存在，字段取值、配色、identity 必须指向已登记的母版）、已确认品牌的母版必须已确认、草稿品牌不进入可选列表、`--brand-id` 按名字选用草稿且缺失、非法或与目录名不一致时不替换、环境变量失效时不改读 settings.json、`list` 列出 `品牌资产/` 下的全部品牌、`inspect` 报告登记与校验值且不写文件、四个模板填好后能通过检查，以及命令行参数互斥。
 
 ```powershell
-python skills/ai-knowledge/scripts/visual_assets.py kit tests/fixtures/personal-demo/visual
-python skills/ai-knowledge/scripts/visual_assets.py kit tests/fixtures/personal-demo/brands/demo-draft
-python skills/ai-knowledge/scripts/visual_assets.py inspect tests/fixtures/personal-demo/brands/demo-draft
-python skills/ai-knowledge/scripts/visual_assets.py context --visual --brand tests/fixtures/personal-demo/visual
+python skills/ai-knowledge/scripts/visual_assets.py kit tests/fixtures/workspace-demo/品牌资产/demo-brand
+python skills/ai-knowledge/scripts/visual_assets.py kit tests/fixtures/workspace-demo/品牌资产/demo-draft
+python skills/ai-knowledge/scripts/visual_assets.py inspect tests/fixtures/workspace-demo/品牌资产/demo-draft
+python skills/ai-knowledge/scripts/visual_assets.py list --workspace tests/fixtures/workspace-demo
+python skills/ai-knowledge/scripts/visual_assets.py context --visual --workspace tests/fixtures/workspace-demo --brand-id demo-brand
 python skills/ai-knowledge/scripts/visual_assets.py bundle examples/concept-sso
 python skills/ai-knowledge/scripts/visual_assets.py bundle examples/feature-oidc-demo
 node tests/check-visuals.mjs

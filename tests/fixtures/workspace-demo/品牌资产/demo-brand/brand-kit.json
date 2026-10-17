@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "2",
+  "brandId": "demo-brand",
+  "name": "演示品牌",
+  "kitVersion": "1.0.0",
+  "status": "confirmed",
+  "usage": [
+    "article",
+    "video"
+  ],
+  "licenseStatus": "public",
+  "approval": {
+    "brandPalette": "proposed"
+  },
+  "palette": {
+    "primary": "#4278C8",
+    "light": "#F5F5F0",
+    "dark": "#1F2937",
+    "accent": "#E6B45A"
+  },
+  "identity": {
+    "original": "assets/canonical/original.png",
+    "turnaround": "assets/canonical/turnaround.png",
+    "detail": "assets/canonical/detail.png"
+  },
+  "contentGuidelines": {
+    "character": "character.md",
+    "style": "style.md",
+    "provenance": "provenance.md"
+  },
+  "assets": [
+    {
+      "id": "original",
+      "path": "assets/canonical/original.png",
+      "role": "canonical",
+      "status": "confirmed",
+      "width": 8,
+      "height": 6,
+      "sha256": "7c027430438c3431db8a85a1c6bca8e3ddcd7712802642156fdc205ff452970b"
+    },
+    {
+      "id": "turnaround",
+      "path": "assets/canonical/turnaround.png",
+      "role": "canonical",
+      "status": "confirmed",
+      "width": 12,
+      "height": 4,
+      "sha256": "2c0960397ef3b0acb63a98f24ec25ea8f89f46bc9a865c8c313729ccdab5ca43"
+    },
+    {
+      "id": "detail",
+      "path": "assets/canonical/detail.png",
+      "role": "canonical",
+      "status": "confirmed",
+      "width": 6,
+      "height": 6,
+      "sha256": "5b40c7d987f543e8bf0f6db63a0d844397e370ac8177cd72a2b96b7890bbe2ab"
+    },
+    {
+      "id": "desk",
+      "path": "assets/scenes/desk.png",
+      "role": "scene",
+      "status": "proposed",
+      "width": 8,
+      "height": 6,
+      "sha256": "5aa368ae948b6d3c1548f97c3ae484091a64a5c6a12ddd95408a6628bcebbda7"
+    }
+  ]
+}

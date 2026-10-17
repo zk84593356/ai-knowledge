@@ -1,7 +1,7 @@
-"""Behavior tests for schemaVersion 2 brand kits: format, draft gate, named brands, list, inspect.
+"""Behavior tests for schemaVersion 2 brand kits: format, workspace brands, named selection, list, inspect.
 
-Kits come from tests/fixtures/personal-demo; the real home directory is replaced by an
-empty temporary one in every test.
+Kits come from tests/fixtures/workspace-demo/品牌资产; the real home directory is replaced by
+an empty temporary one in every test.
 """
 import hashlib
 import importlib.util
@@ -19,10 +19,10 @@ from bundle_fixtures import png_bytes
 from validate import ROOT
 
 PACKAGE = ROOT / "skills/ai-knowledge"
-PERSONAL = ROOT / "tests/fixtures/personal-demo"
-KIT = PERSONAL / "visual"
-DRAFT = PERSONAL / "brands/demo-draft"
-TEMPLATES = PACKAGE / "templates/brand"
+WORKSPACE = ROOT / "tests/fixtures/workspace-demo"
+KIT = WORKSPACE / "品牌资产/demo-brand"
+DRAFT = WORKSPACE / "品牌资产/demo-draft"
+TEMPLATES = PACKAGE / "templates/品牌"
 spec = importlib.util.spec_from_file_location("visual_brand", PACKAGE / "scripts/visual_assets.py")
 visual = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(visual)
@@ -135,50 +135,61 @@ class BrandKitTests(unittest.TestCase):
         self.mutate(kit, lambda d: d["identity"].update(detail="assets/samples/cover.png"))
         self.assertEqual(visual.validate_kit(kit), ["identity.detail must be a canonical asset"])
 
-    def test_default_draft_is_not_used_automatically(self):
-        personal = self.copy(PERSONAL, "personal")
-        shutil.rmtree(personal / "visual")
-        shutil.copytree(DRAFT, personal / "visual")
-        os.environ[ENV] = str(personal)
+    def test_no_brand_is_auto_loaded_and_confirmed_ones_are_offered(self):
+        os.environ[ENV] = str(self.copy(WORKSPACE, "ws"))
         result = visual.select_context(visual=True)
         self.assertEqual((result["route"], result["brand"]), ("generic", None))
-        self.assertIn("draft", result["reason"])
-        self.assertEqual(Path(result["draft"]), (personal / "visual").resolve())
+        self.assertEqual(result["available"], ["demo-brand"])
+        self.assertIn("ask the author", result["reason"])
+
+    def test_workspace_from_settings_file(self):
+        ws = self.copy(WORKSPACE, "ws")
+        (self.home / ".ai-knowledge").mkdir()
+        (self.home / ".ai-knowledge/settings.json").write_text(json.dumps({"workspace": str(ws)}), "utf-8")
+        result = visual.select_context(visual=True, brand_id="demo-brand")
+        self.assertEqual((result["route"], result["source"], result["brandId"]), ("named", "named", "demo-brand"))
+        self.assertEqual(visual.list_kits()["source"], "settings")
 
     def test_named_brand_selects_draft(self):
-        os.environ[ENV] = str(self.copy(PERSONAL, "personal"))
+        os.environ[ENV] = str(self.copy(WORKSPACE, "ws"))
         result = visual.select_context(visual=True, brand_id="demo-draft")
         self.assertEqual((result["route"], result["source"], result["brandId"], result["status"]),
                          ("named", "named", "demo-draft", "draft"))
         self.assertEqual(Path(result["brand"]).name, "demo-draft")
-        default = visual.select_context(visual=True)
-        self.assertEqual((default["route"], default["brandId"]), ("personal", "personal-demo"))
 
     def test_named_brand_missing_or_invalid_does_not_substitute(self):
-        os.environ[ENV] = str(self.copy(PERSONAL, "personal"))
+        os.environ[ENV] = str(self.copy(WORKSPACE, "ws"))
         result = visual.select_context(visual=True, brand_id="absent")
         self.assertEqual((result["route"], result["brand"]), ("generic", None))
         self.assertIn("do not substitute", result["reason"])
-        for value in ("../visual", "Demo", "a/b", ""):
+        for value in ("../demo-brand", "Demo", "a/b", ""):
             with self.subTest(value=value):
                 result = visual.select_context(visual=True, brand_id=value)
                 self.assertEqual((result["route"], result["brand"]), ("generic", None))
 
-    def test_named_brand_with_missing_env_dir_does_not_use_home(self):
-        shutil.copytree(PERSONAL, self.home / ".ai-knowledge/personal")
+    def test_missing_env_dir_does_not_use_settings(self):
+        ws = self.copy(WORKSPACE, "ws")
+        (self.home / ".ai-knowledge").mkdir()
+        (self.home / ".ai-knowledge/settings.json").write_text(json.dumps({"workspace": str(ws)}), "utf-8")
         os.environ[ENV] = str(self.root / "absent")
         result = visual.select_context(visual=True, brand_id="demo-draft")
         self.assertEqual((result["route"], result["brand"]), ("generic", None))
+        self.assertIn("settings not substituted", result["reason"])
 
-    def test_list_kits_reports_default_and_brands(self):
-        personal = self.copy(PERSONAL, "personal")
-        shutil.copytree(DRAFT, personal / "brands/wrong-name")
-        os.environ[ENV] = str(personal)
+    def test_no_workspace_means_generic(self):
+        result = visual.select_context(visual=True, brand_id="demo-brand")
+        self.assertEqual((result["route"], result["brand"]), ("generic", None))
+        self.assertIn("no workspace", result["reason"])
+
+    def test_list_kits_reports_workspace_brands(self):
+        ws = self.copy(WORKSPACE, "ws")
+        shutil.copytree(DRAFT, ws / "品牌资产/wrong-name")
+        os.environ[ENV] = str(ws)
         kits = {k["location"]: k for k in visual.list_kits()["kits"]}
-        self.assertEqual(sorted(kits), ["brands/demo-draft", "brands/wrong-name", "default"])
-        self.assertEqual((kits["default"]["status"], kits["default"]["ok"]), ("confirmed", True))
-        self.assertEqual((kits["brands/demo-draft"]["status"], kits["brands/demo-draft"]["ok"]), ("draft", True))
-        self.assertFalse(kits["brands/wrong-name"]["ok"])
+        self.assertEqual(sorted(kits), ["品牌资产/demo-brand", "品牌资产/demo-draft", "品牌资产/wrong-name"])
+        self.assertEqual((kits["品牌资产/demo-brand"]["status"], kits["品牌资产/demo-brand"]["ok"]), ("confirmed", True))
+        self.assertEqual((kits["品牌资产/demo-draft"]["status"], kits["品牌资产/demo-draft"]["ok"]), ("draft", True))
+        self.assertFalse(kits["品牌资产/wrong-name"]["ok"])
         os.environ[ENV] = str(self.root / "absent")
         self.assertEqual(visual.list_kits()["kits"], [])
 
@@ -202,7 +213,7 @@ class BrandKitTests(unittest.TestCase):
         self.assertEqual(visual.inspect_kit(kit)["registered_missing"], ["assets/canonical/original.png"])
 
     def test_templates_plus_inspect_build_a_valid_draft(self):
-        kit = self.root / "brands/new-brand"
+        kit = self.root / "品牌资产/new-brand"
         (kit / "assets/canonical").mkdir(parents=True)
         for name in ("character.md", "style.md", "provenance.md", "brand-kit.json"):
             shutil.copy(TEMPLATES / name, kit / name)
@@ -220,9 +231,9 @@ class BrandKitTests(unittest.TestCase):
         self.assertEqual(visual.validate_kit(kit), [])
 
     def test_cli_brand_id_list_and_exclusive_options(self):
-        personal = self.copy(PERSONAL, "personal")
+        ws = self.copy(WORKSPACE, "ws")
         env = {k: v for k, v in os.environ.items() if k != ENV}
-        env.update(HOME=str(self.home), USERPROFILE=str(self.home), **{ENV: str(personal)})
+        env.update(HOME=str(self.home), USERPROFILE=str(self.home), **{ENV: str(ws)})
         script = str(PACKAGE / "scripts/visual_assets.py")
         run = subprocess.run([sys.executable, "-B", script, "context", "--visual", "--brand-id", "demo-draft"],
                              capture_output=True, env=env)

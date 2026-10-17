@@ -5,15 +5,16 @@ registered in assets/manifest.json as an editable source. A topic with no assets
 directory and no embedded image passes, because images are optional.
 Does not generate images, infer facts, approve aesthetics, or establish rights.
 
-No personal brand kit is bundled. Lookup order: --brand <kit-dir>, then --brand-id <id>
-(<personal>/brands/<id>), then the default <personal>/visual, where <personal> is
-$AI_KNOWLEDGE_PERSONAL or ~/.ai-knowledge/personal. A kit root holds brand-kit.json
+No brand kit is bundled. Kits live in the author's content workspace under
+品牌资产/<brand-id>/; the workspace is $AI_KNOWLEDGE_WORKSPACE, else "workspace" in
+~/.ai-knowledge/settings.json. Lookup: --brand <kit-dir>, or --brand-id <id>. Nothing
+is auto-loaded: without a choice the context is generic and lists the confirmed kits, so
+the Agent can ask the author which one to use. A kit root holds brand-kit.json
 (schemaVersion 2) plus character.md, style.md, provenance.md and assets/.
-Missing or invalid kits fall back to generic visuals. A draft kit is used only when the
-user selects it explicitly; the default location never auto-loads a draft.
+Missing or invalid kits fall back to generic visuals.
 
-`list` shows the kits in the personal directory; `inspect` prints the size and SHA-256
-of every image under a kit's assets/ so the Agent can register them. No command writes.
+`list` shows the kits in 品牌资产/; `inspect` prints the size and SHA-256 of every image
+under a kit's assets/ so the Agent can register them. No command writes.
 """
 import argparse
 import base64
@@ -27,7 +28,8 @@ import sys
 from urllib.parse import unquote
 import xml.etree.ElementTree as ET
 
-ENV_VAR = "AI_KNOWLEDGE_PERSONAL"
+ENV_VAR = "AI_KNOWLEDGE_WORKSPACE"
+BRANDS = "品牌资产"
 LIMIT = 64 * 1024 * 1024
 TYPES = {"cover", "infographic", "chart", "illustration", "banner", "profile-card"}
 PUBLISHABLE = {".png", ".jpg", ".jpeg"}
@@ -277,16 +279,21 @@ def inspect_kit(root):
     return {"kit": str(root.resolve()), "images": images, "registered_missing": missing}
 
 
-def personal_root():
-    """Return (source, path) for the implicit personal root; path is None if unresolvable."""
+def workspace_root():
+    """Return (source, path) for the implicit workspace; path is None if unresolvable or unset."""
     value = os.environ.get(ENV_VAR, "").strip()
     if value:
         path = Path(value).expanduser()
         return "env", path if path.is_absolute() else None
     try:
-        return "home", Path.home() / ".ai-knowledge" / "personal"
-    except (RuntimeError, KeyError):
-        return "home", None
+        settings = Path.home() / ".ai-knowledge" / "settings.json"
+        value = load(settings).get("workspace") if settings.is_file() else None
+    except (RuntimeError, KeyError, OSError, ValueError):
+        value = None
+    if not isinstance(value, str) or not value.strip():
+        return "settings", None
+    path = Path(value).expanduser()
+    return "settings", path if path.is_absolute() else None
 
 
 def kit_summary(root):
@@ -296,65 +303,66 @@ def kit_summary(root):
             "licenseStatus": kit["licenseStatus"]}
 
 
-def select_context(visual=False, no_brand=False, brand=None, brand_id=None):
+def select_context(visual=False, no_brand=False, brand=None, brand_id=None, workspace=None):
     if not visual:
         return {"route": "text-only", "source": None, "source_path": None, "brand": None,
                 "reason": "visual resources not loaded"}
     result = {"route": "generic", "source": None, "source_path": None, "brand": None,
-              "reason": "personal visual disabled"}
+              "reason": "brand visuals disabled"}
     if no_brand:
         return result
     if brand is not None:
-        source, base = "explicit", Path(brand)
-        root = base
+        source, base, root = "explicit", Path(brand), Path(brand)
     else:
-        source, base = personal_root()
-        result["source"] = "named" if brand_id is not None else source
-        if base is None:
-            result["reason"] = (ENV_VAR + " is not an absolute path; generic visuals" if source == "env"
-                                else "home directory unavailable; generic visuals")
-            return result
-        if brand_id is not None:
-            if not isinstance(brand_id, str) or not BRAND_ID.fullmatch(brand_id):
-                result["reason"] = "invalid brand id; generic visuals, do not substitute another kit"
-                return result
-            root = base / "brands" / brand_id
+        if workspace is not None:
+            source, base = "argument", Path(workspace).expanduser().absolute()
         else:
-            root = base / "visual"
-    selected = source == "explicit" or brand_id is not None
-    result.update(source="named" if brand_id is not None and source != "explicit" else source,
-                  source_path=str(base.resolve()))
-    if not selected and not base.is_dir():
-        # A broken env setting must not silently fall through to the home directory.
-        result["reason"] = (ENV_VAR + " directory missing; generic visuals, home not substituted"
-                            if source == "env" else "no personal config directory; generic visuals")
-        return result
+            source, base = workspace_root()
+        if base is None:
+            result.update(source=source, reason=(ENV_VAR + " is not an absolute path; generic visuals"
+                                                 if source == "env" else "no workspace recorded; generic visuals"))
+            return result
+        result.update(source=source, source_path=str(base.resolve()))
+        if not base.is_dir():
+            # A broken env setting must not silently fall through to settings.json.
+            result["reason"] = (ENV_VAR + " directory missing; generic visuals, settings not substituted"
+                                if source == "env" else "recorded workspace missing; generic visuals")
+            return result
+        if brand_id is None:
+            available = [k["brandId"] for k in list_kits(base)["kits"] if k["ok"] and k["status"] == "confirmed"]
+            result.update(available=available, reason=(
+                "no brand selected; ask the author which brand to use" if available
+                else "no confirmed brand in 品牌资产/; generic visuals"))
+            return result
+        if not isinstance(brand_id, str) or not BRAND_ID.fullmatch(brand_id):
+            result["reason"] = "invalid brand id; generic visuals, do not substitute another kit"
+            return result
+        root = base / BRANDS / brand_id
+    result.update(source="named" if source != "explicit" else source, source_path=str(base.resolve()))
     errors = validate_kit(root)
     if errors:
-        result.update(reason=("selected kit unavailable or invalid; generic visuals, do not substitute another kit"
-                              if selected else "personal kit missing or invalid; generic visuals"),
+        result.update(reason="selected kit unavailable or invalid; generic visuals, do not substitute another kit",
                       issues=errors)
         return result
     summary = kit_summary(root)
-    if not selected and summary["status"] != "confirmed":
-        result.update(reason="default kit is a draft; confirm it or select it by name before use",
-                      draft=str(root.resolve()))
+    if brand_id is not None and summary["brandId"] != brand_id:
+        result["reason"] = "directory name differs from brandId; generic visuals"
         return result
-    route = "explicit" if source == "explicit" else ("named" if brand_id is not None else "personal")
+    route = "explicit" if source == "explicit" else "named"
     return {"route": route, "source": result["source"], "source_path": result["source_path"],
             "brand": str(root.resolve()), **summary}
 
 
-def list_kits():
-    """List the default kit and brands/<id> kits in the personal directory; read-only."""
-    source, base = personal_root()
+def list_kits(base=None):
+    """List the kits under <workspace>/品牌资产/; read-only."""
+    source = "argument"
+    if base is None:
+        source, base = workspace_root()
     result = {"source": source, "source_path": str(base.resolve()) if base else None, "kits": []}
     if base is None or not base.is_dir():
         return result
-    candidates = [("default", base / "visual")]
-    brands = base / "brands"
-    if brands.is_dir():
-        candidates += [("brands/" + p.name, p) for p in sorted(brands.iterdir()) if p.is_dir()]
+    brands = base / BRANDS
+    candidates = [(BRANDS + "/" + p.name, p) for p in sorted(brands.iterdir()) if p.is_dir()] if brands.is_dir() else []
     for location, root in candidates:
         if not (root / "brand-kit.json").is_file():
             continue
@@ -364,7 +372,7 @@ def list_kits():
             entry["issues"] = errors
         else:
             entry.update(kit_summary(root))
-            if location != "default" and entry["brandId"] != root.name:
+            if entry["brandId"] != root.name:
                 entry["ok"] = False
                 entry["issues"] = ["directory name differs from brandId"]
         result["kits"].append(entry)
@@ -520,7 +528,9 @@ def main(argv=None):
     choice = context.add_mutually_exclusive_group()
     choice.add_argument("--brand", type=Path)
     choice.add_argument("--brand-id")
-    sub.add_parser("list")
+    context.add_argument("--workspace", type=Path)
+    listing = sub.add_parser("list")
+    listing.add_argument("--workspace", type=Path)
     for name in ("kit", "bundle", "inspect"):
         command = sub.add_parser(name)
         command.add_argument("directory", type=Path)
@@ -530,9 +540,9 @@ def main(argv=None):
     failed = False
     if args.command == "context":
         result = select_context(visual=args.visual, no_brand=args.no_brand, brand=args.brand,
-                                brand_id=args.brand_id)
+                                brand_id=args.brand_id, workspace=args.workspace)
     elif args.command == "list":
-        result = list_kits()
+        result = list_kits(args.workspace.expanduser().absolute() if args.workspace else None)
     elif args.command == "inspect":
         result = inspect_kit(args.directory)
     else:

@@ -29,20 +29,30 @@ STATUS_WORDING = re.compile(r"未核验|已核验|发布前核验|核验日期|�
 SUMMARY_LIMIT = 60
 MODES = {"explainer", "retrospective", "evaluation", "opinion"}
 REFERENCES = (
-    "发布合同", "用户人设-快速参考", "调研-讲解", "调研-复盘功能", "调研-复盘故障", "调研-测评", "调研-观点",
-    "调研-资料卡", "选题与角度", "协作文档与真实经历", "写作技巧-金字塔原理", "内容写作技巧", "偏航句用法",
-    "打磨与核验", "降AI味指南", "自媒体防限流指南", "平台改编", "口播引导话术", "自媒体动画", "运营沉淀",
-    "视觉-配图验收", "视觉-美术方向", "视觉-品牌加载", "视觉-建立品牌",
-    "风格-加载", "风格-应用", "风格-分析", "风格-改稿复盘", "风格-写回",
+    "流程/工作台初始化", "流程/发布合同", "流程/用户人设", "流程/选题与角度", "流程/协作文档与真实经历",
+    "流程/打磨与核验",
+    "调研/讲解", "调研/复盘功能", "调研/复盘故障", "调研/测评", "调研/观点", "调研/资料卡",
+    "写作/降AI味指南", "写作/平台改编",
+    "视觉/配图验收", "视觉/美术方向", "视觉/品牌加载", "视觉/建立品牌",
+    "风格/加载", "风格/应用", "风格/分析", "风格/改稿复盘", "风格/写回",
 )
-TEMPLATES = ("brief", "协作文档", "资料卡", "用户人设", "article", "review", "口播稿", "经历条目", "改稿复盘",
-             "writing-profile", "writing-rules", "art-brief")
+TEMPLATES = ("brief", "协作文档", "资料卡", "article", "review", "口播稿", "经历条目", "改稿复盘", "art-brief")
 BRAND_TEMPLATES = ("brand-kit.json", "character.md", "style.md", "provenance.md")
+# Starter workspace copied by `create_project.py init`; links must stay inside it.
+SEED = "templates/内容工作台"
+SEED_FILES = (
+    "工作台说明.md", "用户人设.md", "品牌资产/品牌资产说明.md",
+    "风格参考/如何用 Grok Bot 做内容.md", "风格参考/我的写作规则.md", "风格参考/我的写作档案.md",
+    "风格参考/改稿学习日志.md",
+    "写作技巧/内容写作技巧.md", "写作技巧/金字塔原理写作技巧.md", "写作技巧/偏航句用法.md",
+    "规范指南/口播引导话术.md", "规范指南/运营沉淀.md", "规范指南/自媒体动画.md", "规范指南/自媒体防限流指南.md",
+)
 SCRIPTS = ("scripts/analyze_style.py", "scripts/style_learning.py", "scripts/visual_assets.py",
            "scripts/create_project.py", "scripts/save_article.py")
 EXAMPLE_BUNDLES = ("concept-sso", "feature-oidc-demo")
-DEMO_KIT = "tests/fixtures/personal-demo/visual"
-DEMO_DRAFT_KIT = "tests/fixtures/personal-demo/brands/demo-draft"
+DEMO_WORKSPACE = "tests/fixtures/workspace-demo"
+DEMO_KIT = DEMO_WORKSPACE + "/品牌资产/demo-brand"
+DEMO_DRAFT_KIT = DEMO_WORKSPACE + "/品牌资产/demo-draft"
 # Personal config lives outside the repository; these trees must never carry it again.
 PRIVATE_MARKER = "anyues"
 PRIVATE_SCAN = ("skills", "examples")
@@ -204,11 +214,19 @@ def validate_skill(folder):
         if not (folder / "references" / f"{name}.md").is_file():
             errors.append(f"missing reference: {name}")
     for name in TEMPLATES:
-        if not (folder / "templates" / f"{name}-template.md").is_file():
+        if not (folder / "templates/文章" / f"{name}-template.md").is_file():
             errors.append(f"missing template: {name}")
     for name in BRAND_TEMPLATES:
-        if not (folder / "templates/brand" / name).is_file():
+        if not (folder / "templates/品牌" / name).is_file():
             errors.append(f"missing brand template: {name}")
+    seed = folder / SEED
+    for name in SEED_FILES:
+        if not (seed / name).is_file():
+            errors.append(f"missing workspace starter file: {name}")
+    for path in sorted(seed.rglob("*.md")) if seed.is_dir() else []:
+        content = path.read_text(encoding="utf-8")
+        for msg in markdown_errors(content) + local_link_errors(path, content, seed):
+            errors.append(f"{path.relative_to(folder).as_posix()}: {msg}")
     for relative in SCRIPTS:
         if not (folder / relative).is_file():
             errors.append(f"missing script: {relative}")
@@ -217,7 +235,7 @@ def validate_skill(folder):
     if (folder / "styles/personal").exists():
         errors.append("bundled personal config: styles/personal must not exist in the package")
     # Templates link to future output siblings, so check only executable guidance.
-    for path in [entry, *sorted((folder / "references").glob("*.md"))]:
+    for path in [entry, *sorted((folder / "references").rglob("*.md"))]:
         content = path.read_text(encoding="utf-8")
         for msg in markdown_errors(content) + local_link_errors(path, content, folder):
             errors.append(f"{path.relative_to(folder)}: {msg}")
@@ -389,8 +407,8 @@ def validate_repo(root):
     required = ["README.md", "LICENSE", "CHANGELOG.md", "AGENTS.md",
                 "docs/installation.md", "docs/usage-examples.md", "docs/architecture.md",
                 "tests/README.md", "tests/RESULTS.md",
-                *[DEMO_KIT.removesuffix("/visual") + "/" + name for name in
-                  ("writing-profile.md", "writing-rules.md", "learning-log.md")]]
+                *[DEMO_WORKSPACE + "/风格参考/" + name for name in
+                  ("我的写作档案.md", "我的写作规则.md", "改稿学习日志.md")]]
     for name in required:
         if not (root / name).is_file():
             errors.append(f"missing project file: {name}")

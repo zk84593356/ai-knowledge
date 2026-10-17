@@ -62,26 +62,42 @@ Claude Code、Cursor、OpenCode 可用同一安装源，并按 CLI 支持的 `-a
 - 更新未显示：检查重复名称、禁用配置和宿主扫描路径，再重开会话。
 - 生成目标已存在：默认新建日期序号目录，旧文件保持原样。
 
-## 个人配置目录
+## 内容工作台
 
-个人写作规则和视觉品牌不在 Skill 里，安装和更新 Skill 都不会碰它们。Skill 按顺序查找：请求里明确给出的路径 → 环境变量 `AI_KNOWLEDGE_PERSONAL` → `%USERPROFILE%\.ai-knowledge\personal\`。都没有时用公共写作技法和通用图解。默认视觉品牌在其中的 `visual\`，其他品牌在 `brands\<brand-id>\`。
+v0.8.0 起，人设、写作规则、写作技巧、平台规范、视觉品牌和稿件都放在作者自己的内容工作台里，不在 Skill 里，安装和更新 Skill 都不会碰它。Skill 按顺序查找工作台：请求里给出的路径 → 环境变量 `AI_KNOWLEDGE_WORKSPACE` → `%USERPROFILE%\.ai-knowledge\settings.json` 的 `workspace` 字段。都没有时，助手先问要不要建；不建就写到当前项目的 `docs/knowledge/<slug>/`，用 Skill 自带的默认文件和通用图解。
 
-## 内容工作台（v0.7.0 起，可选）
-
-工作台是放用户人设、风格参考、写作技巧和各平台稿件的目录，同样不在 Skill 里。查找顺序：请求里给出的路径 → 环境变量 `AI_KNOWLEDGE_WORKSPACE` → 个人配置目录 `settings.json` 的 `workspace` 字段。都没有时，文章照旧写到当前项目的 `docs/knowledge/<slug>/`。建一个空工作台：
+最简单的初始化方式是对助手说"在 D:\内容工作台 建一个内容工作台"。装了 Python 也可以自己运行：
 
 ```powershell
 python skills/ai-knowledge/scripts/create_project.py init --workspace D:\内容工作台
+python skills/ai-knowledge/scripts/create_project.py brand blue-cat --name "小蓝"   # 可选：建一个品牌的空模板
 ```
 
-目录结构见 [发布合同](../skills/ai-knowledge/references/发布合同.md) 的"内容工作台"一节。
+`init` 把 `skills/ai-knowledge/templates/内容工作台/` 整套复制过去（已有文件不覆盖，逐个列为 kept existing），建好 `我的项目/` 和 `品牌资产/`，并把位置写进 `settings.json`。`settings.json` 已记了别的工作台时不改，加 `--set-default` 才切换；加 `--no-remember` 不写。目录结构见 [发布合同](../skills/ai-knowledge/references/流程/发布合同.md) 的"内容工作台"一节，初始化流程见 [工作台初始化](../skills/ai-knowledge/references/流程/工作台初始化.md)。
+
+多台电脑共用时，把工作台放进私有 Git 仓库或网盘，每台电脑上对同一路径运行一次 `init`（只补缺的文件），或设置用户级环境变量：
+
+```powershell
+[Environment]::SetEnvironmentVariable('AI_KNOWLEDGE_WORKSPACE', 'D:\内容工作台', 'User')
+```
+
+不要把工作台放进 Skill 安装目录或本仓库；仓库校验器会把 skills/ 下出现的 `styles/personal` 视为错误。
+
+## 从 v0.7 升级到 v0.8
+
+- **个人配置目录不再使用。** v0.7 及更早把写作规则和品牌放在 `~/.ai-knowledge/personal/`（或 `AI_KNOWLEDGE_PERSONAL`），v0.8 只读内容工作台，`AI_KNOWLEDGE_PERSONAL` 不再生效。初始化工作台后，对助手说"把我旧的个人配置迁移到工作台"，它会按 [工作台初始化](../skills/ai-knowledge/references/流程/工作台初始化.md) 的迁移表**复制**：`writing-rules.md` → `风格参考/我的写作规则.md`，`writing-profile.md` → `风格参考/我的写作档案.md`，`learning-log.md` → `风格参考/改稿学习日志.md`，`visual/` → `品牌资产/<它的 brandId>/`，`brands/<id>/` → `品牌资产/<id>/`。旧目录原样保留，确认无误后自己删。
+- **工作台位置的记录改了地方。** 以前写在 `~/.ai-knowledge/personal/settings.json`，现在是 `~/.ai-knowledge/settings.json`，里面只放 `workspace`。
+- **不再有默认品牌。** 以前 `visual/` 里的已确认品牌会自动用；现在工作台里可以有多个品牌，写文章时助手会问这篇用哪一个，答案记进需求卡的"配图品牌"。
+- **v0.7 建的空工作台**：对同一路径再运行一次 `init` 即可补上默认的写作技巧、规范指南和风格参考；已有的 `用户人设.md` 不会被覆盖。如果它还是 v0.7 的空白模板，可以删掉后再运行 `init`，换成 v0.8 的默认人设。
+- **Skill 内部文件挪了位置。** `references/` 按 流程/调研/写作/风格/视觉 分了子目录；写作技巧和规范指南移到 `templates/内容工作台/`；文章模板移到 `templates/文章/`，品牌模板从 `templates/brand/` 改为 `templates/品牌/`。自己写过指向旧路径的链接或脚本要跟着改。
+- `style_learning.py context` 和 `visual_assets.py context`、`list` 新增 `--workspace` 参数。
 
 ## 从 v0.6.0 升级到 v0.7.0
 
 - 内容类型由功能/知识/踩坑三种改为讲解 `explainer`、复盘 `retrospective`、测评 `evaluation`、观点 `opinion` 四种。旧文章 frontmatter 里的 `concept`、`feature`、`problem` 不会自动转换；用 `validate.py --bundle` 检查旧稿会报模式无效，需要时手动改成新值（concept → explainer，feature/problem → retrospective）。
 - Skill 内的参考文档改为中文文件名，模板从 `assets/templates/` 移到 `templates/`，文件名加 `-template`。自己写过指向旧路径的链接或脚本要跟着改。
 - 个人配置目录和视觉品牌格式不变，不用转换。
-- 不建工作台也能照旧使用；要用工作台见上一节。
+- 不建工作台也能照旧使用。
 
 ## 从 v0.5.0 升级到 v0.6.0
 
@@ -89,15 +105,9 @@ python skills/ai-knowledge/scripts/create_project.py init --workspace D:\内容�
 
 ## 从 v0.4.0 升级到 v0.5.0
 
-v0.5.0 的视觉品牌只认精简格式（`brand-kit.json` 的 `schemaVersion` 为 `"2"`，外加 character.md、style.md、provenance.md）。旧格式的品牌会被当作无效，回退通用图解，不会报错中断写作。转换方法：先把旧品牌目录整体备份，再按 `skills/ai-knowledge/templates/brand/` 的四个模板合并原来的规范文件，图片原样保留，最后运行 `python skills/ai-knowledge/scripts/visual_assets.py kit <品牌目录>` 确认通过。也可以直接让助手按 [建立视觉品牌](../skills/ai-knowledge/references/视觉-建立品牌.md) 的格式转换。
+v0.5.0 的视觉品牌只认精简格式（`brand-kit.json` 的 `schemaVersion` 为 `"2"`，外加 character.md、style.md、provenance.md）。旧格式的品牌会被当作无效，回退通用图解，不会报错中断写作。转换方法：先把旧品牌目录整体备份，再按品牌模板（v0.8 起在 `skills/ai-knowledge/templates/品牌/`）的四个模板合并原来的规范文件，图片原样保留，最后运行 `python skills/ai-knowledge/scripts/visual_assets.py kit <品牌目录>` 确认通过。也可以直接让助手按 [建立视觉品牌](../skills/ai-knowledge/references/视觉/建立品牌.md) 的格式转换。
 
-要在多台电脑上使用同一份配置，可以把个人目录放进私有 Git 仓库，在每台电脑上克隆后设置用户级环境变量，重开终端和 Agent 生效：
-
-```powershell
-[Environment]::SetEnvironmentVariable('AI_KNOWLEDGE_PERSONAL', 'D:\private\my-style', 'User')
-```
-
-风格学习写回这个目录，下次调用即生效，不需要重装 Skill。不要把个人目录放进 Skill 安装目录或本仓库；仓库校验器会把 skills/ 下出现的 `styles/personal` 视为错误。
+当时的个人配置目录在 v0.8 已由内容工作台取代，见上面的升级说明。
 
 ## 从 v0.3.0 升级到 v0.4.0
 
