@@ -465,7 +465,8 @@ def main():
     parser.add_argument("--skill", type=Path, help="validate an isolated Skill folder")
     parser.add_argument("--bundle", type=Path,
                         help="validate one topic folder containing article.md and review.md")
-    parser.add_argument("--root", type=Path, default=ROOT, help="allowed local citation root")
+    parser.add_argument("--root", type=Path,
+                        help="allowed local citation root (default: repo root; with --bundle, the bundle folder)")
     parser.add_argument("--expected-date", help="optional generation date, YYYY-MM-DD")
     args = parser.parse_args()
     if args.skill and args.bundle:
@@ -475,7 +476,7 @@ def main():
     elif args.bundle:
         errors = validate_bundle(args.bundle, args.root, args.expected_date)
     else:
-        errors = validate_repo(args.root.resolve())
+        errors = validate_repo((args.root or ROOT).resolve())
     for error in errors:
         print(f"FAIL: {error}")
     print(f"{'FAIL' if errors else 'PASS'}: {len(errors)} structural/security-pattern findings")
