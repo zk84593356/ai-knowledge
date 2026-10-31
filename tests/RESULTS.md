@@ -1,5 +1,23 @@
 # 实际验收记录
 
+## v0.9.0 引导共写（含 v0.8.1 补测） — 2026-10-31
+
+新增流程/引导共写.md，协作强度"深度"改为"共写"，只给题目时默认共写；读者遍加新读者测试；降 AI 味指南补两类。v0.8.1 改了图片路径和 `--bundle` 的默认边界，当时没跑检查，这一轮一起补上。
+
+| 命令/检查 | 本轮结果 |
+| --- | --- |
+| python -m unittest discover -s tests | 179 项：178 通过、1 跳过（符号链接权限，同前） |
+| python tests/validate.py | PASS，0 项发现；REFERENCES 新增 流程/引导共写 |
+| python tests/validate.py --bundle（两篇示范，不传边界，按 v0.8.1 默认用稿件目录） | 均 PASS |
+| python skills/ai-knowledge/scripts/visual_assets.py bundle（两篇示范） | ok，0 错误 |
+| SKILL.md 限制 | 119 行（上限 500）；description 460 字符（上限 1024） |
+| 全仓库文本扫描 | skills/ 和 examples/ 里没有 `../assets/`；"深度"作为协作强度只出现在更新记录、本记录、SKILL.md 和 content-workflow.md 的旧说法映射、workflow-gates.md 的旧说法用例里；skills/ 和 examples/ 没有私人标记 |
+| node tests/check-mermaid.mjs | 跳过：PATH 上的 Node 仍是 v12。本轮没改流程图 |
+
+没有验证的：
+
+- 共写流程（一次一问、访谈卡停点、逐节勾选、"直接写"跳过、新读者测试）只做了文字审读，tests/cases/workflow-gates.md 新增的 8 条共写用例没有让 Agent 实际跑过。
+- 借鉴的 6 个项目只读了 SKILL.md 或 README（2026-10-31 访问），没有运行；khazix-writer 的许可证没核对，所以只借思路，没有引用原文。
 ## v0.8.0 个人配置并入内容工作台 — 2026-10-17
 
 references 分目录，写作技巧和规范指南成为工作台默认内容，个人风格和多品牌放进工作台，新增工作台初始化流程和 `create_project.py brand`。

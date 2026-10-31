@@ -14,6 +14,21 @@
 
 这些研究是文档审阅，不代表运行了参考项目。README 的宣传数字不作为本项目验证依据。
 
+## v0.9 引导共写的参考（访问日期 2026-10-31）
+
+只读了各项目的 SKILL.md 或 README，没有运行，也没有复制原文；星数是当日页面显示，不代表质量。
+
+| 资料 | 实际检查范围 | 借鉴与落地 | 未引入 |
+| --- | --- | --- | --- |
+| [Anthropic doc-coauthoring](https://github.com/anthropics/skills/blob/main/skills/doc-coauthoring/SKILL.md) | SKILL.md 全文 | 逐节"提问 → 列要点 → 勾选 → 起草 → 改稿"；请作者说改什么而不是自己改；用没有上下文的新会话做读者测试 | 面向技术文档的三阶段固定流程、artifact 操作 |
+| [nadiem99 interview](https://github.com/nadiem99/claude-writing-skills/blob/main/skills/pipeline/interview/SKILL.md)（2 星） | interview 的 SKILL.md、仓库 README | 一次一问；追问顺序（起因、主张、机制、证据、反方、意义、独特角度）；访谈卡；作者主导、不一次生成整篇 | Obsidian、Readwise 依赖和英文评论文章的固定格式 |
+| [obra superpowers brainstorming](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md) | SKILL.md 全文 | 先看材料再问；一条消息一个问题；作者卡住才给选项；"你定"时提具体方案并标为自己的决定 | 软件设计文档、可视化伴侣 |
+| [khazix-writer](https://github.com/KKKKhazix/khazix-skills/blob/main/khazix-writer/SKILL.md) | SKILL.md 全文；许可证未核对 | 人和 AI 的分工（经历、核心角度、情绪由人来） | 个人文风、禁用冒号和小标题等风格规则、固定尾部 |
+| [Humanizer-zh](https://github.com/op7418/Humanizer-zh)（MIT，2.16 万星） | README 与模式目录 | 降 AI 味指南新增"限定词堆叠""动词名词化"两行；改写不改变确定程度 | 31 项清单整体搬入 |
+| [stanford-oval/storm](https://github.com/stanford-oval/storm)（MIT，3.18 万星） | README | 只作思路参考：多视角提问比直接让模型提问更深 | Python 程序和检索管线 |
+
+TanShilongMario/ArticleSkill、xiaomoBoy/claude-writing-skills 也看过 README，它们是"一句话生成整篇再打分"的路线，和共写的目标相反，没有借鉴。
+
 ## 安装依据及时间敏感项
 
 官方 Agent Skills 要求名称与目录相同、有效 YAML、非空描述（最多 1024 字符）；入口建议控制在 500 行以内。当前项目没有把 examples/tests/docs 放进运行时依赖。
